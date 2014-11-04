@@ -1,4 +1,4 @@
 vr4java
 =======
 
-Java virtual reality project.
+Virtual reality for Java

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.bubblecloud.vr4java</groupId>
+    <artifactId>vr4java-client</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jettyVersion>9.2.0.M0</jettyVersion>
+        <jmonkey.version>3.0.10</jmonkey.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>EclipseLink Repo</id>
+            <url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
+        </repository>
+        <repository>
+            <id>bubblecloud-cloudbees-release</id>
+            <name>bubblecloud-cloudbees-release</name>
+            <url>http://repository-bubblecloud.forge.cloudbees.com/release/</url>
+        </repository>
+        <repository>
+            <id>updates.jmonkeyengine.org</id>
+            <name>updates.jmonkeyengine.org</name>
+            <url>http://updates.jmonkeyengine.org/maven/</url>
+        </repository>
+
+    </repositories>
+
+    <!-- Deploy releases and snapshots to the CloudBees maven repositories -->
+    <distributionManagement>
+        <downloadUrl>http://repository-bubblecloud.forge.cloudbees.com/snapshot/</downloadUrl>
+        <repository>
+            <id>bubblecloud-cloudbees-release</id>
+            <name>bubblecloud-cloudbees-release</name>
+            <url>dav:https://repository-bubblecloud.forge.cloudbees.com/release/</url>
+        </repository>
+        <snapshotRepository>
+            <id>bubblecloud-cloudbees-snapshot</id>
+            <name>bubblecloud-cloudbees-snapshot</name>
+            <url>dav:https://repository-bubblecloud.forge.cloudbees.com/snapshot/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <finalName>vr4java-client</finalName>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav-jackrabbit</artifactId>
+                <version>1.0-beta-7</version>
+            </extension>
+        </extensions>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>org.bubblecloud.vr4java.VrClient</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.bubblecloud.vr4java</groupId>
+            <artifactId>vr4java-common</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-blender</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>-->
+
+        <!--<dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-bullet</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>org.bubblecloud.jbullet</groupId>
+            <artifactId>jbullet</artifactId>
+            <version>2.72.2.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-core</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-desktop</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-effects</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>-->
+
+        <!--<dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-examples</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-jbullet</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-jogg</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-jogl</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-lwjgl</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-networking</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-niftygui</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-plugins</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-terrain</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-testdata</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>-->
+
+        <!--<dependency>
+            <groupId>org.bubblecloud.jme3</groupId>
+            <artifactId>jme3-open-asset-pack</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>-->
+
+    </dependencies>
+
+</project>
+

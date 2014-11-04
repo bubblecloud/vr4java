@@ -1,0 +1,1 @@
+web: java -jar vr4java-server/target/vr4java-server.jar

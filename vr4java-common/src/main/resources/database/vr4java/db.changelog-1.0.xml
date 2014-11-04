@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+    <changeSet author="tlaukkan (generated)" id="1414525790433-1">
+        <createTable tableName="ambientlightnode">
+            <column name="id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="coloralpha" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="colorblue" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="colorgreen" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="colorred" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-2">
+        <createTable tableName="cuboidnode">
+            <column name="id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dimensionx" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dimensiony" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dimensionz" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shininess" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="texture" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-3">
+        <createTable tableName="directionallightnode">
+            <column name="id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="coloralpha" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="colorblue" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="colorgreen" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="colorred" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="directionx" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="directiony" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="directionz" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-4">
+        <createTable tableName="modelnode">
+            <column name="id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="model" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-5">
+        <createTable tableName="scene">
+            <column name="id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ownercertificatefingerprint" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="x" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="y" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="z" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-6">
+        <createTable tableName="scenenode">
+            <column name="id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dtype" type="VARCHAR(31)"/>
+            <column name="actionanimationindex" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actionanimationrate" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="aw" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ax" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ay" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="az" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mass" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ownercertificatefingerprint" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parentid" type="VARCHAR(36)"/>
+            <column name="radius" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stateanimationindex" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stateanimationrate" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="x" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="y" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="z" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="scene_id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-7">
+        <createTable tableName="torusnode">
+            <column name="id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="circlesamples" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="innerradius" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="outerradius" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="radialsamples" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shininess" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="texture" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-8">
+        <addPrimaryKey columnNames="id" constraintName="ambientlightnode_pkey" tableName="ambientlightnode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-9">
+        <addPrimaryKey columnNames="id" constraintName="cuboidnode_pkey" tableName="cuboidnode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-10">
+        <addPrimaryKey columnNames="id" constraintName="directionallightnode_pkey" tableName="directionallightnode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-11">
+        <addPrimaryKey columnNames="id" constraintName="modelnode_pkey" tableName="modelnode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-12">
+        <addPrimaryKey columnNames="id" constraintName="scene_pkey" tableName="scene"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-13">
+        <addPrimaryKey columnNames="id" constraintName="scenenode_pkey" tableName="scenenode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-14">
+        <addPrimaryKey columnNames="id" constraintName="torusnode_pkey" tableName="torusnode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-15">
+        <addForeignKeyConstraint baseColumnNames="id" baseTableName="ambientlightnode" constraintName="fk_ambientlightnode_id" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scenenode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-16">
+        <addForeignKeyConstraint baseColumnNames="id" baseTableName="cuboidnode" constraintName="fk_cuboidnode_id" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scenenode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-17">
+        <addForeignKeyConstraint baseColumnNames="id" baseTableName="directionallightnode" constraintName="fk_directionallightnode_id" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scenenode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-18">
+        <addForeignKeyConstraint baseColumnNames="user_userid" baseTableName="emailpasswordreset" constraintName="fk_emailpasswordreset_user_userid" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="user_"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-19">
+        <addForeignKeyConstraint baseColumnNames="id" baseTableName="modelnode" constraintName="fk_modelnode_id" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scenenode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-20">
+        <addForeignKeyConstraint baseColumnNames="scene_id" baseTableName="scenenode" constraintName="fk_scenenode_scene_id" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scene"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414525790433-21">
+        <addForeignKeyConstraint baseColumnNames="id" baseTableName="torusnode" constraintName="fk_torusnode_id" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scenenode"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414611321184-1">
+        <addColumn tableName="scene">
+            <column name="created" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414611321184-2">
+        <addColumn tableName="scenenode">
+            <column name="created" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414611321184-3">
+        <addColumn tableName="scene">
+            <column name="modified" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414611321184-4">
+        <addColumn tableName="scenenode">
+            <column name="modified" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414611321184-5">
+        <addColumn tableName="scene">
+            <column name="owner_companyid" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414611321184-6">
+        <addColumn tableName="scenenode">
+            <column name="owner_companyid" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414611321184-7">
+        <addForeignKeyConstraint baseColumnNames="owner_companyid" baseTableName="scene" constraintName="fk_scene_owner_companyid" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="companyid" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="tlaukkan (generated)" id="1414611321184-8">
+        <addForeignKeyConstraint baseColumnNames="owner_companyid" baseTableName="scenenode" constraintName="fk_scenenode_owner_companyid" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="companyid" referencedTableName="company"/>
+    </changeSet>
+</databaseChangeLog>
