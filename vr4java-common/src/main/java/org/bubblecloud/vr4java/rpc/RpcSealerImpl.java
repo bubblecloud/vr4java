@@ -4,8 +4,8 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 import org.bubblecloud.vr4java.security.CertificateService;
+import org.bubblecloud.vr4java.security.CertificateUtil;
 import org.bubblecloud.vr4java.util.BytesUtil;
-import org.vaadin.addons.sitekit.util.CertificateUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

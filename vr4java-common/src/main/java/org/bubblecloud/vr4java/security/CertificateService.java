@@ -2,7 +2,6 @@ package org.bubblecloud.vr4java.security;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
-import org.vaadin.addons.sitekit.util.CertificateUtil;
 
 import javax.security.cert.Certificate;
 import java.io.*;
@@ -18,7 +17,7 @@ public class CertificateService {
 
     public static final String CERTIFICATE_ALIAS_PROPERTIES_PATH = "./certificate-alias.properties";
 
-    public static final String CERTIFICATE_STORE_PATH = "./certificate-store.bks";
+    public static final String CERTIFICATE_STORE_PATH = "./certificate-store.jks";
 
     public static final String CERTIFICATE_STORE_PASSWORD = "changeme";
 

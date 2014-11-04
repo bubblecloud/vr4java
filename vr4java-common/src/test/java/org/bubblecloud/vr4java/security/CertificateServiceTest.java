@@ -3,9 +3,7 @@ package org.bubblecloud.vr4java.security;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.vaadin.addons.sitekit.util.CertificateUtil;
 
-import javax.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 /**
