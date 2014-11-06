@@ -5,7 +5,7 @@
     <groupId>org.bubblecloud.vr4java</groupId>
     <artifactId>vr4java-common</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
