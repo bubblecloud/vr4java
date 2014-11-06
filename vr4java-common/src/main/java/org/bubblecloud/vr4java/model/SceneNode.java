@@ -659,15 +659,12 @@ public class SceneNode {
 
         Vector3f delta = new Vector3f(interpolatedTargetTranslation);
         delta = delta.subtract(interpolatedTranslation);
-        delta = delta.mult(2f * timeDelta / ServerMain.CYCLE_LENGTH_SECONDS);
+        delta = delta.mult(timeDelta / ServerMain.CYCLE_LENGTH_SECONDS);
 
         interpolatedTranslation = interpolatedTranslation.add(delta);
 
-
         interpolatedTargetRotation.slerp(targetRotation, timeDelta / ServerMain.CYCLE_LENGTH_SECONDS);
-        interpolatedRotation.slerp(interpolatedTargetRotation, timeDelta / (ServerMain.CYCLE_LENGTH_SECONDS / 2));
-        //interpolatedRotation.interpolate(targetRotation, timeDelta / (ServerMain.CYCLE_LENGTH_SECONDS / 2));
-
+        interpolatedRotation.slerp(interpolatedTargetRotation, timeDelta / ServerMain.CYCLE_LENGTH_SECONDS);
     }
 
     @Override
