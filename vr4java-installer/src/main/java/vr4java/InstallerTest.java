@@ -56,7 +56,7 @@ public class InstallerTest {
         session.setTransferListener( new ConsoleTransferListener() );
         session.setRepositoryListener( new ConsoleRepositoryListener() );
 
-        Artifact artifact = new DefaultArtifact( "org.bubblecloud.vr4java:vr4java-client:1.0.2" );
+        Artifact artifact = new DefaultArtifact( "org.bubblecloud.vr4java:vr4java-client:1.0.6" );
 
         DependencyFilter classpathFlter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
 
@@ -66,6 +66,7 @@ public class InstallerTest {
         collectRequest.setRepositories(
                 Arrays.asList(
                         new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build(),
+                        new RemoteRepository.Builder("EclipseLink", "default", "http://download.eclipse.org/rt/eclipselink/maven.repo").build(),
                         new RemoteRepository.Builder("bubblecloud", "default", "http://repository-bubblecloud.forge.cloudbees.com/release/").build())
 
         );
