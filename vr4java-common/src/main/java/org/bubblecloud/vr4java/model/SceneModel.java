@@ -15,7 +15,7 @@ public class SceneModel {
 
     private SceneNode[] dynamicNodeTable = new SceneNode[MAX_DYNAMIC_NODE_COUNT];
 
-    private Map<UUID, SceneNode> nodes = new HashMap<UUID, SceneNode>();
+    private Map<UUID, SceneNode> nodes = new TreeMap<UUID, SceneNode>();
 
     public SceneModel() {
 
