@@ -80,6 +80,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.briandilley.jsonrpc4j</groupId>
+            <artifactId>jsonrpc4j</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.6</version>
@@ -89,27 +94,16 @@
             <artifactId>log4j</artifactId>
             <version>1.2.16</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.0</version>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.bubblecloud.ilves</groupId>
-            <artifactId>ilves-vaadin</artifactId>
+            <artifactId>ilves-common</artifactId>
             <version>2.7.11</version>
         </dependency>
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>9.1-901.jdbc4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.3.2</version>
         </dependency>
 
         <dependency>
@@ -129,11 +123,7 @@
             <artifactId>javax-websocket-client-impl</artifactId>
             <version>${jettyVersion}</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.briandilley.jsonrpc4j</groupId>
-            <artifactId>jsonrpc4j</artifactId>
-            <version>1.1</version>
-        </dependency>
+
         <dependency>
             <groupId>javax.portlet</groupId>
             <artifactId>portlet-api</artifactId>
@@ -141,14 +131,23 @@
         </dependency>
 
         <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
-        </dependency>
-        <dependency>
             <groupId>org.bubblecloud</groupId>
             <artifactId>vecmath</artifactId>
             <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.3.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

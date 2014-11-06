@@ -1,11 +1,10 @@
-package org.bubblecloud.vr4java;
+package org.bubblecloud.vr4java.server;
 
 import junit.framework.Assert;
 import org.bubblecloud.vr4java.client.ClientNetworkController;
 import org.bubblecloud.vr4java.model.CuboidNode;
 import org.bubblecloud.vr4java.model.SceneNode;
 import org.bubblecloud.vr4java.model.Scene;
-import org.bubblecloud.vr4java.server.ServerMain;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

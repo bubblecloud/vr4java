@@ -2,26 +2,22 @@ package org.bubblecloud.vr4java.server;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bubblecloud.vr4java.api.SceneService;
 import org.bubblecloud.vr4java.model.Scene;
 import org.bubblecloud.vr4java.model.SceneNode;
 import org.bubblecloud.vr4java.rpc.RpcSealer;
 import org.bubblecloud.vr4java.rpc.RpcSealerImpl;
+import org.bubblecloud.vr4java.util.VrConstants;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 import org.vaadin.addons.sitekit.jetty.DefaultJettyConfiguration;
-import org.vaadin.addons.sitekit.site.DefaultSiteUI;
 import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
-import javax.persistence.EntityManager;
 import javax.websocket.server.ServerContainer;
 import java.net.URI;
-import java.security.Security;
 import java.util.List;
 
 /**
@@ -37,11 +33,6 @@ public class ServerMain {
     public static final String LOCALIZATION_BUNDLE = "site-localization";
     /** The web service port. */
     public static final int WS_PORT = 8080;
-
-    /** The server cycle in milliseconds. */
-    public static final long CYCLE_LENGTH_MILLIS = 200;
-    /** The server cycle in seconds. */
-    public static final float CYCLE_LENGTH_SECONDS = CYCLE_LENGTH_MILLIS / 1000f;
 
     /** Cycle count. */
     private long cycleCount = 0;
@@ -137,7 +128,7 @@ public class ServerMain {
         LOGGER.info("Server main loop started.");
         long lastCycleStartMillis = System.currentTimeMillis();
         try {
-            Thread.sleep(CYCLE_LENGTH_MILLIS);
+            Thread.sleep(VrConstants.CYCLE_LENGTH_MILLIS);
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -147,13 +138,13 @@ public class ServerMain {
 
                 final long cycleStartTimeMillis = System.currentTimeMillis();
                 final long timeDeltaMillis = cycleStartTimeMillis - lastCycleStartMillis;
-                long timeExceededMillisLastRound = timeDeltaMillis - CYCLE_LENGTH_MILLIS;
+                long timeExceededMillisLastRound = timeDeltaMillis - VrConstants.CYCLE_LENGTH_MILLIS;
 
                 if (timeExceededMillisLastRound < 0) {
                     timeExceededMillisLastRound = 0;
                 }
-                if (timeExceededMillisLastRound > CYCLE_LENGTH_MILLIS / 2) {
-                    timeExceededMillisLastRound = CYCLE_LENGTH_MILLIS / 2;
+                if (timeExceededMillisLastRound > VrConstants.CYCLE_LENGTH_MILLIS / 2) {
+                    timeExceededMillisLastRound = VrConstants.CYCLE_LENGTH_MILLIS / 2;
                 }
 
                 try {
@@ -167,9 +158,9 @@ public class ServerMain {
                 final long cycleEndTimeMillis = System.currentTimeMillis();
                 final long cycleTimeMillis = cycleEndTimeMillis - cycleStartTimeMillis;
 
-                if (CYCLE_LENGTH_MILLIS > cycleTimeMillis + timeExceededMillisLastRound) {
+                if (VrConstants.CYCLE_LENGTH_MILLIS > cycleTimeMillis + timeExceededMillisLastRound) {
                     try {
-                        Thread.sleep(CYCLE_LENGTH_MILLIS - cycleTimeMillis - timeExceededMillisLastRound);
+                        Thread.sleep(VrConstants.CYCLE_LENGTH_MILLIS - cycleTimeMillis - timeExceededMillisLastRound);
                     } catch (final InterruptedException e) {
                         LOGGER.trace("Server main loop sleep interrupted.");
                     }

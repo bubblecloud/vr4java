@@ -7,7 +7,6 @@ import org.vaadin.addons.sitekit.dao.CompanyDao;
 import org.vaadin.addons.sitekit.dao.UserDao;
 import org.vaadin.addons.sitekit.model.Company;
 import org.vaadin.addons.sitekit.model.User;
-import org.vaadin.addons.sitekit.util.PersistenceUtil;
 import org.vaadin.addons.sitekit.util.TestUtil;
 
 import javax.persistence.EntityManager;

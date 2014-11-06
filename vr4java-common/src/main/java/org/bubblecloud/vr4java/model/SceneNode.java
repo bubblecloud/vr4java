@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.bubblecloud.vecmath.Quaternion;
 import org.bubblecloud.vecmath.Vector3f;
-import org.bubblecloud.vr4java.server.ServerMain;
 import org.bubblecloud.vr4java.util.BytesUtil;
+import org.bubblecloud.vr4java.util.VrConstants;
 import org.vaadin.addons.sitekit.model.Company;
 
 import javax.persistence.*;
@@ -653,18 +653,18 @@ public class SceneNode {
 
         Vector3f targetDelta = new Vector3f(nextTargetTranslation);
         targetDelta = targetDelta.subtract(currentTargetTranslation);
-        targetDelta = targetDelta.mult(timeDelta / ServerMain.CYCLE_LENGTH_SECONDS);
+        targetDelta = targetDelta.mult(timeDelta / VrConstants.CYCLE_LENGTH_SECONDS);
 
         interpolatedTargetTranslation = interpolatedTargetTranslation.add(targetDelta);
 
         Vector3f delta = new Vector3f(interpolatedTargetTranslation);
         delta = delta.subtract(interpolatedTranslation);
-        delta = delta.mult(timeDelta / ServerMain.CYCLE_LENGTH_SECONDS);
+        delta = delta.mult(timeDelta / VrConstants.CYCLE_LENGTH_SECONDS);
 
         interpolatedTranslation = interpolatedTranslation.add(delta);
 
-        interpolatedTargetRotation.slerp(targetRotation, timeDelta / ServerMain.CYCLE_LENGTH_SECONDS);
-        interpolatedRotation.slerp(interpolatedTargetRotation, timeDelta / ServerMain.CYCLE_LENGTH_SECONDS);
+        interpolatedTargetRotation.slerp(targetRotation, timeDelta / VrConstants.CYCLE_LENGTH_SECONDS);
+        interpolatedRotation.slerp(interpolatedTargetRotation, timeDelta / VrConstants.CYCLE_LENGTH_SECONDS);
     }
 
     @Override
