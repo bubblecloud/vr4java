@@ -10,6 +10,7 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.system.AppSettings;
 import org.apache.log4j.Logger;
 import org.bubblecloud.vr4java.client.ClientNetworkController;
+import org.bubblecloud.vr4java.client.ClientNetworkStartupListener;
 import org.bubblecloud.vr4java.ui.*;
 
 import java.util.logging.Level;
@@ -28,13 +29,22 @@ public class VrClient extends SimpleApplication {
     public static void main(String[] args) throws Exception {
         java.util.logging.Logger.getLogger("").setLevel(Level.SEVERE);
 
+        final VrSplash vrSplash = new VrSplash();
+
         final ClientNetworkController clientNetworkController = new ClientNetworkController();
         try {
-            clientNetworkController.start();
+            clientNetworkController.start(new ClientNetworkStartupListener() {
+                @Override
+                public void message(String message) {
+                    vrSplash.render(message);
+                }
+            });
         } catch (final Exception e) {
             LOGGER.error("Error connecting to server.", e);
             return;
         }
+
+        vrSplash.render("Starting...");
         final AppSettings appSettings = new AppSettings(true);
         appSettings.setResolution(1920, 1080);
         appSettings.setFullscreen(true);
@@ -55,6 +65,7 @@ public class VrClient extends SimpleApplication {
         };
         shutdownAppState.setEnabled(true);
         app.getStateManager().attach(shutdownAppState);
+        vrSplash.close();
     }
 
     public VrClient(ClientNetworkController clientNetworkController) {

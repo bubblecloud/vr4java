@@ -74,7 +74,11 @@ public class ClientNetworkController {
         return new UUID(msb, lsb);
     }
 
-    public void start() throws Exception {
+    public void start(final ClientNetworkStartupListener listener) throws Exception {
+        if (listener != null) {
+            listener.message("Connecting...");
+        }
+
         client.start();
 
         serverSceneService = RpcProxyUtil.createClientProxy(SceneService.class.getClassLoader(),
@@ -82,13 +86,19 @@ public class ClientNetworkController {
         serverPackageService = RpcProxyUtil.createClientProxy(SceneService.class.getClassLoader(),
                 PackageService.class, client.getRpcEndpoint());
 
+        if (listener != null) {
+            listener.message("Loading scene...");
+        }
+
         for (final Scene scene : serverSceneService.getScenes()) {
             clientService.addScene(scene, serverSceneService.getNodes(scene.getId()));
             scenes.put(scene.getId(), scene);
             LOGGER.info("Added server scene to client: " + scene.getName() + " (" + scene.getId() + ")");
         }
 
+        int i = 0;
         for (final String packageId : serverPackageService.getPackageIds()) {
+            i++;
             LOGGER.info("Server uses package '" + packageId + "'.");
 
             final String packageUrl = packageUrlPrefix + "/" + packageId;
@@ -108,7 +118,10 @@ public class ClientNetworkController {
                 continue;
             }
 
-            LOGGER.info("Downloading package '" + packageId + "' ...");
+            LOGGER.info("Downloading '" + packageId + "' ...");
+            if (listener != null) {
+                listener.message("Downloading packet " + i);
+            }
 
             final URLConnection connection = new URL(packageUrl).openConnection();
             final FileOutputStream fileOutputStream = new FileOutputStream(packageFile, false);
@@ -119,7 +132,9 @@ public class ClientNetworkController {
             ZipUtil.unzip(packageFile, packageDirectory);
 
             LOGGER.info("Downloaded package '" + packageId + "' ...");
-
+            if (listener != null) {
+                listener.message("Downloaded packet " + i);
+            }
         }
     }
 
@@ -172,7 +187,7 @@ public class ClientNetworkController {
 
         final ClientNetworkController main = new ClientNetworkController();
 
-        main.start();
+        main.start(null);
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override

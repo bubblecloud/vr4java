@@ -37,7 +37,7 @@ public class ClientServerTest {
 
     @Test
     public void testNetwork() throws Exception {
-        clientNetworkController.start();
+        clientNetworkController.start(null);
 
         Thread.sleep(200);
 

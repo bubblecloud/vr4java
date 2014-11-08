@@ -93,6 +93,9 @@
                             <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>org.bubblecloud.vr4java.VrClient</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <SplashScreen-Image>splash.png</SplashScreen-Image>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
