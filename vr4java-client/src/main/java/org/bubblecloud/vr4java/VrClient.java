@@ -35,7 +35,7 @@ public class VrClient extends SimpleApplication {
         final File newInstaller = new File("installer-new.jar");
 
         if (newInstaller.exists()) {
-            if (oldInstaller.exists()) {
+            if (oldInstaller.exists() && newInstaller.lastModified() > oldInstaller.lastModified()) {
                 LOGGER.info("Deleting installer from the way of new installer.");
                 Thread.sleep(1000);
                 oldInstaller.delete();
