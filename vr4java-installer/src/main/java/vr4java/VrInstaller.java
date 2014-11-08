@@ -64,13 +64,13 @@ public class VrInstaller {
         session.setRepositoryListener( new ConsoleRepositoryListener(vrSplash, System.out) );
         session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
 
-        download("installer-new.jar", "org.bubblecloud.vr4java", "vr4java-installer", remoteRepositories, system, session);
-        download("client.jar", "org.bubblecloud.vr4java", "vr4java-client", remoteRepositories, system, session);
+        download("installer.jar","installer-new.jar", "org.bubblecloud.vr4java", "vr4java-installer", remoteRepositories, system, session);
+        download("client.jar", "client.jar", "org.bubblecloud.vr4java", "vr4java-client", remoteRepositories, system, session);
 
         Runtime.getRuntime().exec("java -jar client.jar");
     }
 
-    private static void download(final String mainTargetFile, String groupId, String artifactId, List<RemoteRepository> remoteRepositories, RepositorySystem system, DefaultRepositorySystemSession session) throws VersionRangeResolutionException, DependencyResolutionException, IOException {
+    private static void download(final String oldFile, final String newFile, String groupId, String artifactId, List<RemoteRepository> remoteRepositories, RepositorySystem system, DefaultRepositorySystemSession session) throws VersionRangeResolutionException, DependencyResolutionException, IOException {
         final Artifact artifactVersionRange = new DefaultArtifact(groupId + ":" + artifactId + ":[0,)");
 
         final VersionRangeRequest rangeRequest = new VersionRangeRequest();
@@ -102,23 +102,25 @@ public class VrInstaller {
         for ( ArtifactResult artifactResult : artifactResults )
         {
             final File repositoryFile = artifactResult.getArtifact().getFile();
-            final File destinationFile;
-
+            final File destinationOldFile;
+            final File destinationNewFile;
             if (groupId.equals(artifactResult.getArtifact().getGroupId()) &&
                     artifactId.equals(artifactResult.getArtifact().getArtifactId()) &&
                     version.equals(artifactResult.getArtifact().getVersion())) {
-                destinationFile = new File(mainTargetFile);
-                mainArtifactFile = destinationFile;
+                destinationOldFile = new File(oldFile);
+                destinationNewFile = new File(newFile);
+                mainArtifactFile = destinationNewFile;
             } else {
-                destinationFile = new File("lib/" + repositoryFile.getName());
+                destinationOldFile = new File("lib/" + repositoryFile.getName());
+                destinationNewFile = new File("lib/" + repositoryFile.getName());
             }
 
             //System.out.println(artifactResult.getArtifact() + " resolved to " + destinationFile + "(" + repositoryFile + ")");
 
-            if (!destinationFile.exists() || destinationFile.lastModified() != repositoryFile.lastModified() ||
-                    destinationFile.length() != repositoryFile.length()) {
-                FileUtils.copyFile(repositoryFile, destinationFile);
-                System.out.println("Copied from repository: " + destinationFile);
+            if (!destinationOldFile.exists() || destinationOldFile.lastModified() != repositoryFile.lastModified() ||
+                    destinationOldFile.length() != repositoryFile.length()) {
+                FileUtils.copyFile(repositoryFile, destinationNewFile);
+                System.out.println("Copied from repository: " + destinationNewFile);
             }
         }
         System.out.println("Main artifact file: " + mainArtifactFile);
