@@ -13,6 +13,7 @@ import org.bubblecloud.vr4java.client.ClientNetworkController;
 import org.bubblecloud.vr4java.client.ClientNetworkStartupListener;
 import org.bubblecloud.vr4java.ui.*;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 
@@ -29,6 +30,27 @@ public class VrClient extends SimpleApplication {
 
     public static void main(String[] args) throws Exception {
         java.util.logging.Logger.getLogger("").setLevel(Level.SEVERE);
+
+        final File oldInstaller = new File("installer.jar");
+        final File newInstaller = new File("installer-new.jar");
+
+        if (newInstaller.exists()) {
+            if (oldInstaller.exists()) {
+                LOGGER.info("Deleting installer from the way of new installer.");
+                Thread.sleep(1000);
+                oldInstaller.delete();
+                Thread.sleep(1000);
+            }
+            if (!oldInstaller.exists()) {
+                LOGGER.info("Renaming new installer as installer.");
+                newInstaller.renameTo(oldInstaller);
+                if (oldInstaller.exists()) {
+                    LOGGER.info("Re-executing installer.");
+                    Runtime.getRuntime().exec("java -jar installer.jar");
+                    return;
+                }
+            }
+        }
 
         final VrSplash vrSplash = new VrSplash();
 

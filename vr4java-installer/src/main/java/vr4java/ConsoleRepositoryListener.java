@@ -23,14 +23,11 @@ public class ConsoleRepositoryListener
 {
 
     private PrintStream out;
+    private VrSplash vrSplash;
 
-    public ConsoleRepositoryListener()
+    public ConsoleRepositoryListener( final VrSplash vrSplash, PrintStream out )
     {
-        this( null );
-    }
-
-    public ConsoleRepositoryListener( PrintStream out )
-    {
+        this.vrSplash = vrSplash;
         this.out = ( out != null ) ? out : System.out;
     }
 
@@ -72,7 +69,7 @@ public class ConsoleRepositoryListener
 
     public void artifactDownloading( RepositoryEvent event )
     {
-        out.println( "Downloading artifact " + event.getArtifact() + " from " + event.getRepository() );
+        vrSplash.render("Downloading: " +event.getArtifact().getArtifactId());
     }
 
     public void artifactDownloaded( RepositoryEvent event )
@@ -87,12 +84,12 @@ public class ConsoleRepositoryListener
 
     public void metadataDeployed( RepositoryEvent event )
     {
-        out.println( "Deployed " + event.getMetadata() + " to " + event.getRepository() );
+        //out.println( "Deployed " + event.getMetadata() + " to " + event.getRepository() );
     }
 
     public void metadataDeploying( RepositoryEvent event )
     {
-        out.println( "Deploying " + event.getMetadata() + " to " + event.getRepository() );
+        //out.println( "Deploying " + event.getMetadata() + " to " + event.getRepository() );
     }
 
     public void metadataInstalled( RepositoryEvent event )

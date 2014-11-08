@@ -142,7 +142,7 @@ public class ConsoleTransferListener
 
         if ( !( event.getException() instanceof MetadataNotFoundException ) )
         {
-            out.println("Download failed: " + event.getException().getMessage());
+            //out.println("Download failed: " + event.getException().getMessage());
         }
     }
 

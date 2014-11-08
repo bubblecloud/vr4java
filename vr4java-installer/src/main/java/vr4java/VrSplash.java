@@ -1,10 +1,9 @@
-package org.bubblecloud.vr4java;
+package vr4java;
 
 import org.apache.log4j.Logger;
 
 import java.awt.*;
-import java.awt.event.*;
- 
+
 public class VrSplash {
     private static final Logger LOGGER = Logger.getLogger(VrSplash.class.getName());
     private static final int FONT_HEIGHT = 18;

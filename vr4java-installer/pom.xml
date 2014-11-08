@@ -52,12 +52,14 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>vr4java</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <archive>
                         <manifest>
                             <mainClass>vr4java.VrInstaller</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <SplashScreen-Image>splash.png</SplashScreen-Image>
+                        </manifestEntries>
                     </archive>
                 </configuration>
                 <executions>

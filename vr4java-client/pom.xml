@@ -47,7 +47,6 @@
     </distributionManagement>
 
     <build>
-        <finalName>vr4java-client</finalName>
         <extensions>
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>

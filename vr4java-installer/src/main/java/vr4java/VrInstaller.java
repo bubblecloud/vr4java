@@ -17,10 +17,7 @@ import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.resolution.DependencyRequest;
-import org.eclipse.aether.resolution.VersionRangeRequest;
-import org.eclipse.aether.resolution.VersionRangeResult;
+import org.eclipse.aether.resolution.*;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
@@ -30,6 +27,7 @@ import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.eclipse.aether.version.Version;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,10 +37,9 @@ import java.util.List;
 public class VrInstaller {
 
     public static void main(final String[] args) throws Exception{
-        final String groupId = "org.bubblecloud.vr4java";
-        final String artifactId = "vr4java-client";
-
+        final VrSplash vrSplash = new VrSplash();
         final LocalRepository localRepository = new LocalRepository("repo");
+
         final List<RemoteRepository> remoteRepositories = Arrays.asList(
                 new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build(),
                 new RemoteRepository.Builder("EclipseLink", "default", "http://download.eclipse.org/rt/eclipselink/maven.repo").build(),
@@ -64,9 +61,16 @@ public class VrInstaller {
         final DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
         session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepository ) );
         session.setTransferListener( new ConsoleTransferListener() );
-        session.setRepositoryListener( new ConsoleRepositoryListener() );
+        session.setRepositoryListener( new ConsoleRepositoryListener(vrSplash, System.out) );
         session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
 
+        download("installer-new.jar", "org.bubblecloud.vr4java", "vr4java-installer", remoteRepositories, system, session);
+        download("client.jar", "org.bubblecloud.vr4java", "vr4java-client", remoteRepositories, system, session);
+
+        Runtime.getRuntime().exec("java -jar client.jar");
+    }
+
+    private static void download(final String mainTargetFile, String groupId, String artifactId, List<RemoteRepository> remoteRepositories, RepositorySystem system, DefaultRepositorySystemSession session) throws VersionRangeResolutionException, DependencyResolutionException, IOException {
         final Artifact artifactVersionRange = new DefaultArtifact(groupId + ":" + artifactId + ":[0,)");
 
         final VersionRangeRequest rangeRequest = new VersionRangeRequest();
@@ -103,7 +107,7 @@ public class VrInstaller {
             if (groupId.equals(artifactResult.getArtifact().getGroupId()) &&
                     artifactId.equals(artifactResult.getArtifact().getArtifactId()) &&
                     version.equals(artifactResult.getArtifact().getVersion())) {
-                destinationFile = new File(repositoryFile.getName());
+                destinationFile = new File(mainTargetFile);
                 mainArtifactFile = destinationFile;
             } else {
                 destinationFile = new File("lib/" + repositoryFile.getName());
@@ -118,8 +122,6 @@ public class VrInstaller {
             }
         }
         System.out.println("Main artifact file: " + mainArtifactFile);
-
-        final Process vrClientProcess = Runtime.getRuntime().exec("java -jar " + mainArtifactFile);
     }
 
 }
