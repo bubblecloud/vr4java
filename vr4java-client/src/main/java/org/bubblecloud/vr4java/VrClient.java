@@ -104,7 +104,8 @@ public class VrClient extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-
+        setDisplayFps(false);
+        setDisplayStatView(false);
         flyCam.setEnabled(false);
         viewPort.setBackgroundColor(ColorRGBA.White);
         final BulletAppState physicsState = new BulletAppState();
