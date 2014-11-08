@@ -87,6 +87,7 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
                 try {
                     LOGGER.warn("Already connected: " + remoteFingerprint);
                     getSession().close();
+                    service.getSession().close();
                 } catch (IOException e) {
                     LOGGER.warn("Error closing new session with client already connected: " + remoteFingerprint);
                 }
