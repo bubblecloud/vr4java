@@ -62,8 +62,6 @@ public class VrInstaller {
         session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepository ) );
         session.setTransferListener( new ConsoleTransferListener() );
         session.setRepositoryListener( new ConsoleRepositoryListener(vrSplash, System.out) );
-        session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
-
         download("installer.jar","installer-new.jar", "org.bubblecloud.vr4java", "vr4java-installer", remoteRepositories, system, session);
         download("client.jar", "client.jar", "org.bubblecloud.vr4java", "vr4java-client", remoteRepositories, system, session);
 
@@ -77,6 +75,7 @@ public class VrInstaller {
         rangeRequest.setArtifact(artifactVersionRange);
         rangeRequest.setRepositories(remoteRepositories);
 
+        session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
         final VersionRangeResult rangeResult = system.resolveVersionRange( session, rangeRequest );
 
         final Version newestVersion = rangeResult.getHighestVersion();
