@@ -14,6 +14,7 @@ import org.bubblecloud.vr4java.client.ClientNetworkStartupListener;
 import org.bubblecloud.vr4java.ui.*;
 
 import java.util.logging.Level;
+import java.util.prefs.BackingStoreException;
 
 /**
  * Virtual reality for Java main class.
@@ -44,28 +45,35 @@ public class VrClient extends SimpleApplication {
             return;
         }
 
-        vrSplash.render("Starting...");
+        vrSplash.close();
         final AppSettings appSettings = new AppSettings(true);
-        appSettings.setResolution(1920, 1080);
-        appSettings.setFullscreen(true);
-        appSettings.setFrequency(60);
         appSettings.setSamples(8);
         appSettings.setVSync(true);
 
+        try {
+            appSettings.load("vr4java");
+        } catch (BackingStoreException e) {
+            LOGGER.info("Error loading settings", e);
+        }
+
         final VrClient app = new VrClient(clientNetworkController);
         app.setSettings(appSettings);
-        app.setShowSettings(false);
+        app.setShowSettings(true);
         app.start();
 
         final AppState shutdownAppState = new AbstractAppState() {
             @Override
             public void cleanup() {
+                try {
+                    appSettings.save("vr4java");
+                } catch (BackingStoreException e) {
+                    LOGGER.info("Error saving settings", e);
+                }
                 clientNetworkController.stop();
             }
         };
         shutdownAppState.setEnabled(true);
         app.getStateManager().attach(shutdownAppState);
-        vrSplash.close();
     }
 
     public VrClient(ClientNetworkController clientNetworkController) {

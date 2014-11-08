@@ -643,12 +643,12 @@ public class SceneNode {
         targetRotation = rotation;
     }
 
-    public void interpolate(final float timeDelta) {
+    public boolean interpolate(final float timeDelta) {
         if (nextTargetTranslation == null) {
-            return;
+            return false;
         }
         if (timeDelta == 0) {
-            return;
+            return false;
         }
 
         Vector3f targetDelta = new Vector3f(nextTargetTranslation);
@@ -665,6 +665,8 @@ public class SceneNode {
 
         interpolatedTargetRotation.slerp(targetRotation, timeDelta / VrConstants.CYCLE_LENGTH_SECONDS);
         interpolatedRotation.slerp(interpolatedTargetRotation, timeDelta / VrConstants.CYCLE_LENGTH_SECONDS);
+
+        return true;
     }
 
     @Override

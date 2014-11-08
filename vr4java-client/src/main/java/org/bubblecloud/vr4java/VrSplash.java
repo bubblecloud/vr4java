@@ -7,7 +7,7 @@ import java.awt.event.*;
  
 public class VrSplash {
     private static final Logger LOGGER = Logger.getLogger(VrClient.class.getName());
-    private static final int FONT_HEIGHT = 20;
+    private static final int FONT_HEIGHT = 18;
     private SplashScreen splash;
     private Graphics2D graphics;
     private final Font font;
@@ -41,9 +41,9 @@ public class VrSplash {
             return;
         }
         final Rectangle bounds = splash.getBounds();
-        final int width = bounds.width / 2;
+        final int width = bounds.width;
         final int height = 40;
-        final int x = bounds.width / 4;
+        final int x = bounds.width / 8;
         final int y = bounds.height / 2 - height / 2;
         final String[] comps = {"foo", "bar", "baz"};
         graphics.setColor(new Color(1f, 1f, 1f, 1f));

@@ -143,7 +143,7 @@ public class SceneController implements SceneServiceListener {
 
     @Override
     public void onStateSlug(UUID sceneId, List<UUID> nodeIds) {
-        LOGGER.debug("Scene " + sceneId + " on state slug for nodes: " + nodeIds);
+        LOGGER.info("Scene " + sceneId + " on state slug for nodes: " + nodeIds);
 
         synchronized (sluggedNodes) {
             if (sceneId.equals(scene.getId())) {
@@ -270,21 +270,23 @@ public class SceneController implements SceneServiceListener {
                 continue;
             }
 
-            sceneNode.interpolate(tpf);
+            if (sceneNode.interpolate(tpf)) {
 
-            spatial.setLocalTranslation(
-                    sceneNode.getInterpolatedTranslation().x,
-                    sceneNode.getInterpolatedTranslation().y,
-                    sceneNode.getInterpolatedTranslation().z);
+                spatial.setLocalTranslation(
+                        sceneNode.getInterpolatedTranslation().x,
+                        sceneNode.getInterpolatedTranslation().y,
+                        sceneNode.getInterpolatedTranslation().z);
 
-            spatial.setLocalRotation(
-                    new Quaternion(
-                            sceneNode.getInterpolatedRotation().getX(),
-                            sceneNode.getInterpolatedRotation().getY(),
-                            sceneNode.getInterpolatedRotation().getZ(),
-                            sceneNode.getInterpolatedRotation().getW()
-                    )
-            );
+                spatial.setLocalRotation(
+                        new Quaternion(
+                                sceneNode.getInterpolatedRotation().getX(),
+                                sceneNode.getInterpolatedRotation().getY(),
+                                sceneNode.getInterpolatedRotation().getZ(),
+                                sceneNode.getInterpolatedRotation().getW()
+                        )
+                );
+
+            }
 
         }
     }

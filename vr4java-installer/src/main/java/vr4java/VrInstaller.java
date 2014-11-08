@@ -16,6 +16,7 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.VersionRangeRequest;
@@ -38,9 +39,6 @@ import java.util.List;
 public class VrInstaller {
 
     public static void main(final String[] args) throws Exception{
-        // Configure logging.
-        DOMConfigurator.configure("log4j.xml");
-
         final String groupId = "org.bubblecloud.vr4java";
         final String artifactId = "vr4java-client";
 
@@ -67,6 +65,7 @@ public class VrInstaller {
         session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepository ) );
         session.setTransferListener( new ConsoleTransferListener() );
         session.setRepositoryListener( new ConsoleRepositoryListener() );
+        session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
 
         final Artifact artifactVersionRange = new DefaultArtifact(groupId + ":" + artifactId + ":[0,)");
 
@@ -89,8 +88,10 @@ public class VrInstaller {
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot( new Dependency( artifact, JavaScopes.COMPILE ) );
         collectRequest.setRepositories(remoteRepositories);
-        DependencyRequest dependencyRequest = new DependencyRequest( collectRequest, classpathFilter );
-        List<ArtifactResult> artifactResults =
+        final DependencyRequest dependencyRequest = new DependencyRequest( collectRequest, classpathFilter );
+
+        session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
+        final List<ArtifactResult> artifactResults =
                 system.resolveDependencies( session, dependencyRequest ).getArtifactResults();
 
         File mainArtifactFile = null;
@@ -117,6 +118,8 @@ public class VrInstaller {
             }
         }
         System.out.println("Main artifact file: " + mainArtifactFile);
+
+        final Process vrClientProcess = Runtime.getRuntime().exec("java -jar " + mainArtifactFile);
     }
 
 }
