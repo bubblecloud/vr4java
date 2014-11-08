@@ -19,3 +19,4 @@ certificate-*
 *.log
 assets/
 asset-cache/
+repo/
