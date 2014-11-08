@@ -5,7 +5,7 @@
     <groupId>org.bubblecloud.vr4java</groupId>
     <artifactId>vr4java-server</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -107,7 +107,7 @@
         <dependency>
             <groupId>org.bubblecloud.vr4java</groupId>
             <artifactId>vr4java-common</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.bubblecloud.ilves</groupId>
