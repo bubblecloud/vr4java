@@ -20,3 +20,5 @@ certificate-*
 assets/
 asset-cache/
 repo/
+lib/
+*.jar

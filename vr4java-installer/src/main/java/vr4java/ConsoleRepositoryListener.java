@@ -67,7 +67,7 @@ public class ConsoleRepositoryListener
 
     public void artifactResolved( RepositoryEvent event )
     {
-        out.println( "Resolved artifact " + event.getArtifact() + " from " + event.getRepository() );
+        //out.println( "Resolved artifact " + event.getArtifact() + " from " + event.getRepository() );
     }
 
     public void artifactDownloading( RepositoryEvent event )
@@ -82,7 +82,7 @@ public class ConsoleRepositoryListener
 
     public void artifactResolving( RepositoryEvent event )
     {
-        out.println( "Resolving artifact " + event.getArtifact() );
+        //out.println( "Resolving artifact " + event.getArtifact() );
     }
 
     public void metadataDeployed( RepositoryEvent event )
@@ -112,12 +112,12 @@ public class ConsoleRepositoryListener
 
     public void metadataResolved( RepositoryEvent event )
     {
-        out.println( "Resolved metadata " + event.getMetadata() + " from " + event.getRepository() );
+        //out.println( "Resolved metadata " + event.getMetadata() + " from " + event.getRepository() );
     }
 
     public void metadataResolving( RepositoryEvent event )
     {
-        out.println( "Resolving metadata " + event.getMetadata() + " from " + event.getRepository() );
+        //out.println( "Resolving metadata " + event.getMetadata() + " from " + event.getRepository() );
     }
 
 }

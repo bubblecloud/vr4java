@@ -1,5 +1,7 @@
 package vr4java;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -26,6 +28,7 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.eclipse.aether.version.Version;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -75,12 +78,12 @@ public class VrInstaller {
 
         final Version newestVersion = rangeResult.getHighestVersion();
 
-        final String newestVersionString = newestVersion.toString();
-        System.out.println( "Newest version " + newestVersionString + " from repository "
+        final String version = newestVersion.toString();
+        System.out.println( "Newest version " + version + " from repository "
                 + rangeResult.getRepository( newestVersion ));
 
-
-        final Artifact artifact = new DefaultArtifact(groupId + ":" + artifactId + ":" + newestVersionString);
+        final String artifactFullId = groupId + ":" + artifactId + ":" + version;
+        final Artifact artifact = new DefaultArtifact(artifactFullId);
 
         final DependencyFilter classpathFilter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
         CollectRequest collectRequest = new CollectRequest();
@@ -90,10 +93,30 @@ public class VrInstaller {
         List<ArtifactResult> artifactResults =
                 system.resolveDependencies( session, dependencyRequest ).getArtifactResults();
 
+        File mainArtifactFile = null;
         for ( ArtifactResult artifactResult : artifactResults )
         {
-            System.out.println( artifactResult.getArtifact() + " resolved to " + artifactResult.getArtifact().getFile() );
+            final File repositoryFile = artifactResult.getArtifact().getFile();
+            final File destinationFile;
+
+            if (groupId.equals(artifactResult.getArtifact().getGroupId()) &&
+                    artifactId.equals(artifactResult.getArtifact().getArtifactId()) &&
+                    version.equals(artifactResult.getArtifact().getVersion())) {
+                destinationFile = new File(repositoryFile.getName());
+                mainArtifactFile = destinationFile;
+            } else {
+                destinationFile = new File("lib/" + repositoryFile.getName());
+            }
+
+            //System.out.println(artifactResult.getArtifact() + " resolved to " + destinationFile + "(" + repositoryFile + ")");
+
+            if (!destinationFile.exists() || destinationFile.lastModified() != repositoryFile.lastModified() ||
+                    destinationFile.length() != repositoryFile.length()) {
+                FileUtils.copyFile(repositoryFile, destinationFile);
+                System.out.println("Copied from repository: " + destinationFile);
+            }
         }
+        System.out.println("Main artifact file: " + mainArtifactFile);
     }
 
 }
