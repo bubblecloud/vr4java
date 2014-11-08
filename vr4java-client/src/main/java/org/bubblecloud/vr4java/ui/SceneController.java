@@ -99,8 +99,7 @@ public class SceneController implements SceneServiceListener {
             sluggedNodes.clear();
         }
         synchronized (removedNodes) {
-            final List<SceneNode> nodes = clientRpcService.getNodes(scene.getId(), new ArrayList(removedNodes));
-            removeNodes(nodes);
+            removeNodes(removedNodes);
             removedNodes.clear();
         }
 
@@ -144,7 +143,7 @@ public class SceneController implements SceneServiceListener {
 
     @Override
     public void onStateSlug(UUID sceneId, List<UUID> nodeIds) {
-        LOGGER.info("Scene " + sceneId + " on state slug for nodes: " + nodeIds);
+        //LOGGER.info("Scene " + sceneId + " on state slug for nodes: " + nodeIds);
 
         synchronized (sluggedNodes) {
             if (sceneId.equals(scene.getId())) {
@@ -222,13 +221,13 @@ public class SceneController implements SceneServiceListener {
         }
     }
 
-    public void removeNodes(List<SceneNode> nodes) {
-        for (final SceneNode node : nodes) {
-            final Spatial spatial = spatials.get(node.getId());
+    public void removeNodes(HashSet<UUID> nodeIds) {
+        for (final UUID nodeId : nodeIds) {
+            final Spatial spatial = spatials.get(nodeId);
             if (spatial != null) {
                 rootNode.detachChild(spatial);
             }
-            spatials.remove(node.getId());
+            spatials.remove(nodeId);
         }
     }
 
@@ -239,7 +238,7 @@ public class SceneController implements SceneServiceListener {
                 continue;
             }
             node.updateInterpolateTarget();
-            LOGGER.info("Slugged " + node.getName() + ": " + node.getAx() + "," + node.getAy() + "," + node.getAz() + "," + node.getAw());
+            //LOGGER.info("Slugged " + node.getName() + ": " + node.getAx() + "," + node.getAy() + "," + node.getAz() + "," + node.getAw());
             if (animationControllers.containsKey(node.getId())) {
                 animationControllers.get(node.getId()).animate(node.getStateAnimationIndex(), node.getStateAnimationRate() / 600f);
             }
