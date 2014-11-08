@@ -23,6 +23,7 @@ import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.io.IOException;
 import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -81,6 +82,17 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
     @Override
     public void onConnect(final String remoteFingerprint, final X509Certificate remoteCertificate) {
         LOGGER.info("Client connect: " + remoteFingerprint + " (" + this.toString() + ")");
+        for (final ServerRpcService service : services) {
+            if (service.getRemoteFingerprint().equals(remoteFingerprint)) {
+                try {
+                    LOGGER.warn("Already connected: " + remoteFingerprint);
+                    getSession().close();
+                } catch (IOException e) {
+                    LOGGER.warn("Error closing new session with client already connected: " + remoteFingerprint);
+                }
+                return;
+            }
+        }
         this.remoteFingerprint = remoteFingerprint;
         clientService = RpcProxyUtil.createClientProxy(SceneService.class.getClassLoader(),
                 SceneService.class, getRpcEndpoint());

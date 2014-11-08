@@ -30,6 +30,10 @@ public class SceneModel {
     }
 
     public void addNode(final SceneNode node) {
+        if (nodes.containsKey(node.getId())) {
+            LOGGER.warn("Node already exist: " + node.getId());
+            return;
+        }
         node.setIndex(-1);
         nodes.put(node.getId(), node);
     }
@@ -96,6 +100,10 @@ public class SceneModel {
             return;
         }
         final SceneNode node = nodes.get(id);
+        if (node.getIndex() != -1) {
+            LOGGER.warn(node.getId() + " already dynamic.");
+            return;
+        }
         node.setIndex(index);
         dynamicNodeTable[index] = node;
         return;
