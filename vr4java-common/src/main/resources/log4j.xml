@@ -10,18 +10,28 @@
         </layout>
     </appender>
 
+    <appender name="rolling" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="vr4java.log"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %-5p %c{2} - %m%n"/>
+        </layout>
+    </appender>
+
     <logger name="liquibase" additivity="false">
         <level value="error"/>
+        <appender-ref ref="rolling"/>
         <appender-ref ref="console"/>
     </logger>
 
     <logger name="org.eclipse.jetty" additivity="false">
         <level value="error"/>
+        <appender-ref ref="rolling"/>
         <appender-ref ref="console"/>
     </logger>
 
     <root>
         <priority value="info"/>
+        <appender-ref ref="rolling"/>
         <appender-ref ref="console"/>
     </root>
 
