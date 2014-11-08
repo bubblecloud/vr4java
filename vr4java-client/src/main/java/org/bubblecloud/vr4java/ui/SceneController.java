@@ -22,6 +22,7 @@ import org.bubblecloud.vr4java.api.SceneServiceListener;
 import org.bubblecloud.vr4java.client.ClientNetworkController;
 import org.bubblecloud.vr4java.client.ClientRpcService;
 import org.bubblecloud.vr4java.model.*;
+import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import java.util.*;
 
@@ -365,27 +366,29 @@ public class SceneController implements SceneServiceListener {
 
     public void loadScene() {
 
-        // Test balls
-        final Material ballMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        ballMaterial.setTexture("DiffuseMap", assetManager.loadTexture("jme3-open-asset-pack-v1/textures/rose_fisher_grassy_gradient.jpg"));
-        ballMaterial.setBoolean("UseMaterialColors", true);
-        ballMaterial.setColor("Ambient", ColorRGBA.LightGray);
-        ballMaterial.setColor("Diffuse", ColorRGBA.LightGray);
-        ballMaterial.setFloat("Shininess", 1);
+        if ("true".equals(PropertiesUtil.getProperty("vr4java-client", "test-objects"))) {
+            // Test balls
+            final Material ballMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+            ballMaterial.setTexture("DiffuseMap", assetManager.loadTexture("jme3-open-asset-pack-v1/textures/rose_fisher_grassy_gradient.jpg"));
+            ballMaterial.setBoolean("UseMaterialColors", true);
+            ballMaterial.setColor("Ambient", ColorRGBA.LightGray);
+            ballMaterial.setColor("Diffuse", ColorRGBA.LightGray);
+            ballMaterial.setFloat("Shininess", 1);
 
-        float radius = 0.2f;
-        int n = 4;
-        for (int i = -n; i <= n; i++) {
-            for (int j = -n; j <= n; j++) {
-                for (int k = -n; k <= n; k++) {
-                    Sphere sphere = new Sphere(20, 20, radius);
-                    Geometry ballGeometry = new Geometry("Soccer ball", sphere);
-                    ballGeometry.setMaterial(ballMaterial);
-                    ballGeometry.setLocalTranslation(i * 2.2f * radius, k * 2.2f * radius, j * 2.2f * radius);
-                    ballGeometry.addControl(new RigidBodyControl(.001f));
-                    ballGeometry.getControl(RigidBodyControl.class).setRestitution(0f);
-                    rootNode.attachChild(ballGeometry);
-                    physicsSpace.add(ballGeometry);
+            float radius = 0.2f;
+            int n = 4;
+            for (int i = -n; i <= n; i++) {
+                for (int j = -n; j <= n; j++) {
+                    for (int k = -n; k <= n; k++) {
+                        Sphere sphere = new Sphere(20, 20, radius);
+                        Geometry ballGeometry = new Geometry("Soccer ball", sphere);
+                        ballGeometry.setMaterial(ballMaterial);
+                        ballGeometry.setLocalTranslation(i * 2.2f * radius, k * 2.2f * radius, j * 2.2f * radius);
+                        ballGeometry.addControl(new RigidBodyControl(.001f));
+                        ballGeometry.getControl(RigidBodyControl.class).setRestitution(0f);
+                        rootNode.attachChild(ballGeometry);
+                        physicsSpace.add(ballGeometry);
+                    }
                 }
             }
         }
