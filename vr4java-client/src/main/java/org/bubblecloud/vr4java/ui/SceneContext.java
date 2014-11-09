@@ -22,6 +22,7 @@ public class SceneContext {
     private SteeringController steeringController;
     private SceneController sceneController;
     private AudioRecordController audioRecordController;
+    private AudioPlaybackController audioPlaybackController;
 
     private Character character;
 
@@ -103,5 +104,13 @@ public class SceneContext {
 
     public void setAudioRecordController(AudioRecordController audioRecordController) {
         this.audioRecordController = audioRecordController;
+    }
+
+    public AudioPlaybackController getAudioPlaybackController() {
+        return audioPlaybackController;
+    }
+
+    public void setAudioPlaybackController(AudioPlaybackController audioPlaybackController) {
+        this.audioPlaybackController = audioPlaybackController;
     }
 }

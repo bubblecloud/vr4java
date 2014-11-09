@@ -144,12 +144,12 @@ public class SteeringController implements ActionListener, RawInputListener {
     }
 
     public void onTalkBegin() {
-        LOGGER.info("Talk begin.");
+        //LOGGER.info("Talk begin.");
         sceneContext.getAudioRecordController().beginAudioRecord();
     }
 
     public void onTalkEnd() {
-        LOGGER.info("Talk end.");
+        //LOGGER.info("Talk end.");
         sceneContext.getAudioRecordController().endAudioRecord();
     }
 

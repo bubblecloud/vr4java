@@ -49,7 +49,7 @@ public class AudioRecorder {
 
     public void stop() {
         if (shutdownRequested) {
-            throw new RuntimeException("Already stopped");
+            return;
         }
         shutdownRequested = true;
         recordThread.interrupt();
@@ -65,11 +65,11 @@ public class AudioRecorder {
         while(!shutdownRequested) {
             int count = targetDataLine.read(buffer, 0, buffer.length);
             if (count > 0) {
-                LOGGER.info("Recorded audio: " + count + " bytes.");
+                //LOGGER.info("Recorded audio: " + count + " bytes.");
                 audioPlayer.write(buffer, 0, count);
             }
         }
-        targetDataLine.stop();
+        targetDataLine.close();
     }
 
 }

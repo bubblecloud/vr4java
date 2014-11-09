@@ -158,7 +158,8 @@ public class SceneController implements SceneServiceListener {
 
     @Override
     public void onPlayNodeAudio(UUID sceneId, UUID nodeId, byte[] bytes) {
-
+        //LOGGER.info("Client received node audio: " + nodeId + " (" + bytes.length + ")");
+        sceneContext.getAudioPlaybackController().playAudio(sceneId, nodeId, bytes);
     }
 
     public void updateSpatialTransformation(SceneNode node, Spatial spatial) {
@@ -415,6 +416,7 @@ public class SceneController implements SceneServiceListener {
         physicsSpace.add(characterControl);
 
         final SceneNode sceneNode = new ModelNode(modelName);
+        sceneNode.setScene(scene);
         sceneNode.setPersistent(false);
         sceneNode.setName(name);
         updateNodeTransformation(characterNode, sceneNode);

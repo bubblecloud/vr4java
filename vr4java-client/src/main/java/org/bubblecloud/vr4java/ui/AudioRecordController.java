@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.bubblecloud.vr4java.audio.AudioPlayer;
 import org.bubblecloud.vr4java.audio.AudioRecorder;
 
+import java.util.Arrays;
+
 /**
  * Created by tlaukkan on 11/9/2014.
  */
@@ -26,12 +28,21 @@ public class AudioRecordController {
             audioRecorder = new AudioRecorder(new AudioPlayer() {
                 @Override
                 public void write(byte[] b, int off, int len) {
-                    LOGGER.debug("Recorded audio bytes: " + len);
+                    //LOGGER.debug("Recorded audio bytes: " + len);
+                    if (off != 0) {
+                        throw new RuntimeException("Offset is assumed to be zero but was: " + off);
+                    }
+                    sceneContext.getClientNetworkController().playNodeAudio(
+                            sceneContext.getCharacter().getSceneNode().getScene().getId(),
+                            sceneContext.getCharacter().getSceneNode().getId(),
+                            Arrays.copyOf(b, len)
+                    );
                 }
             });
             audioRecorder.start();
         } catch (final Exception e) {
             LOGGER.error("Error starting audio recording.", e);
+            return;
         }
         LOGGER.info("Audio recording started.");
     }
@@ -42,6 +53,12 @@ public class AudioRecordController {
             return;
         }
         audioRecorder.stop();
+        audioRecorder = null;
         LOGGER.info("Audio recording stopped.");
+        // Signaling end of stream.
+        sceneContext.getClientNetworkController().playNodeAudio(
+                sceneContext.getCharacter().getSceneNode().getScene().getId(),
+                sceneContext.getCharacter().getSceneNode().getId(),
+                new byte[0]);
     }
 }

@@ -56,7 +56,6 @@ public class AudioPlayerImpl implements AudioPlayer {
             throw new RuntimeException("Already stopped");
         }
         shutdownRequested = true;
-        playThread.interrupt();
     }
 
     @Override
@@ -71,10 +70,14 @@ public class AudioPlayerImpl implements AudioPlayer {
     private void process() {
         try {
             byte buffer[] = new byte[AudioConstants.AUDIO_BUFFER_SIZE];
-            int count;
-            while (!shutdownRequested && (count = pipedInputStream.read(buffer, 0, buffer.length)) != -1) {
+            int count = 1;
+            Thread.sleep(1000); // Buffering
+            while ((count > 0 || !shutdownRequested) && (count = pipedInputStream.read(buffer, 0, buffer.length)) != -1) {
                 if (count > 0) {
+                    //LOGGER.info("Playing audio: " + count + " with buffer left: " + pipedInputStream.available());
                     sourceDataLine.write(buffer, 0, count);
+                } else {
+                    Thread.sleep(100);
                 }
             }
             sourceDataLine.drain();
