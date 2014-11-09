@@ -48,10 +48,9 @@ public class SceneNode {
 
     @PrePersist
     private void prePersist() {
-        if (uuid == null) {
-            uuid = UUID.randomUUID();
+        if (uuid != null) {
+            id = uuid.toString();
         }
-        id = uuid.toString();
         if (parentUuid != null) {
             parentId = parentUuid.toString();
         }
@@ -59,6 +58,9 @@ public class SceneNode {
 
     @PreUpdate
     private void preUpdate() {
+        if (uuid != null) {
+            id = uuid.toString();
+        }
         if (parentUuid != null) {
             parentId = parentUuid.toString();
         }
@@ -66,7 +68,9 @@ public class SceneNode {
 
     @PostLoad
     private void postLoad() {
-        uuid = UUID.fromString(id);
+        if (id != null) {
+            uuid = UUID.fromString(id);
+        }
         if (parentId != null) {
             parentUuid = UUID.fromString(parentId);
         }
@@ -317,6 +321,9 @@ public class SceneNode {
 
     public void setId(UUID id) {
         this.uuid = id;
+        if (id != null) {
+            this.id = id.toString();
+        }
     }
 
     public UUID getParentId() {
@@ -325,6 +332,9 @@ public class SceneNode {
 
     public void setParentId(UUID parentId) {
         this.parentUuid = parentId;
+        if (parentId != null) {
+            this.parentId = parentId.toString();
+        }
     }
 
     public String getName() {

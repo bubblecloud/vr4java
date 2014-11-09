@@ -94,15 +94,17 @@ public class ClientNetworkController {
             final Collection<SceneNode> nodes = serverSceneService.getNodes(scene.getId());
 
             final List<UUID> dynamicNodeIds = new ArrayList<UUID>();
+            final List<Integer> dynamicNodeIndexes = new ArrayList<Integer>();
             for (final SceneNode node : nodes) {
                 if (node.getIndex() > 0) {
                     dynamicNodeIds.add(node.getId());
+                    dynamicNodeIndexes.add(node.getIndex());
                 }
             }
 
             clientService.addScene(scene, nodes);
 
-            clientService.setNodesDynamic(scene.getId(), dynamicNodeIds);
+            clientService.setNodesDynamic(scene.getId(), dynamicNodeIds, dynamicNodeIndexes);
 
             scenes.put(scene.getId(), scene);
             LOGGER.info("Added server scene to client: " + scene.getName() + " (" + scene.getId() + ")");

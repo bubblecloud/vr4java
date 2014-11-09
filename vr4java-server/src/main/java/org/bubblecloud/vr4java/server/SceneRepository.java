@@ -15,6 +15,7 @@ import org.vaadin.addons.sitekit.model.Group;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -135,8 +136,15 @@ public class SceneRepository {
             if (sceneNode.isPersistent()) {
                 sceneNode.setScene(scene);
                 sceneNode.setOwner(serverContext.getCompany());
-                if (sceneNode.getCreated() != null) {
-                    nodesToUpdate.add(serverContext.getEntityManager().merge(sceneNode));
+                final SceneNode savedNode = SceneNodeDao.getSceneNode(serverContext.getEntityManager(), sceneNode.getId());
+                serverContext.getEntityManager().detach(savedNode);
+                if (savedNode != null) {
+                    sceneNode.setCreated(savedNode.getCreated());
+                    sceneNode.setModified(new Date());
+                    final SceneNode mergedNode = serverContext.getEntityManager().merge(sceneNode);
+                    mergedNode.setId(sceneNode.getId());
+                    mergedNode.setParentId(sceneNode.getParentId());
+                    nodesToUpdate.add(mergedNode);
                 } else {
                     nodesToAdd.add(sceneNode);
                 }
@@ -150,8 +158,12 @@ public class SceneRepository {
             throw new SecurityException("User " + serverContext.getUser().getUserId() + " node save denied to scene: " + sceneId);
         }
 
-        SceneNodeDao.addSceneNodes(serverContext.getEntityManager(), nodesToAdd);
-        SceneNodeDao.updateSceneNodes(serverContext.getEntityManager(), nodesToUpdate);
+        if (nodesToAdd.size() != 0) {
+            SceneNodeDao.addSceneNodes(serverContext.getEntityManager(), nodesToAdd);
+        }
+        if (nodesToUpdate.size() != 0) {
+            SceneNodeDao.updateSceneNodes(serverContext.getEntityManager(), nodesToUpdate);
+        }
     }
 
     public void removeNodes(final UUID sceneId, final List<UUID> sceneNodeIds) {

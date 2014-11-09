@@ -22,7 +22,15 @@ public class Scene {
     private UUID uuid;
 
     @PrePersist
-    private void prePersist() {
+         private void prePersist() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID();
+        }
+        id = uuid.toString();
+    }
+
+    @PreUpdate
+    private void preUpdate() {
         if (uuid == null) {
             uuid = UUID.randomUUID();
         }

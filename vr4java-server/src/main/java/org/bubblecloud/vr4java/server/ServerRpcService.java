@@ -186,6 +186,7 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
     @Override
     public void updateNodes(UUID sceneId, List<SceneNode> nodes) {
         serverSceneService.updateNodes(sceneId, nodes);
+        sceneRepository.saveNodes(sceneId, nodes);
         for (final ServerRpcService service : services) {
             service.getClientService().updateNodes(sceneId, nodes);
         }

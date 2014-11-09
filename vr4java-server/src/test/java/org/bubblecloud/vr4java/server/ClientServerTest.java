@@ -96,6 +96,21 @@ public class ClientServerTest {
             }
 
             @Override
+            public void onSetNodesDynamic(UUID sceneId, List<UUID> ids) {
+
+            }
+
+            @Override
+            public void onSetNodesDynamic(UUID sceneId, List<UUID> ids, List<Integer> indexes) {
+
+            }
+
+            @Override
+            public void onSetNodesStatic(UUID sceneId, List<UUID> ids) {
+
+            }
+
+            @Override
             public void onPlayNodeAudio(UUID sceneId, UUID nodeId, byte[] bytes) {
                 receivedNodeAudioBytes = bytes;
                 LOGGER.info("Test received audio bytes: " + bytes.length);

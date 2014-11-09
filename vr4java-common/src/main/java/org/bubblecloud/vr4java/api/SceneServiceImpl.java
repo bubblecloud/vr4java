@@ -232,7 +232,7 @@ public class SceneServiceImpl implements SceneService {
         }
         synchronized (sceneServiceListeners) {
             for (final SceneServiceListener listener : sceneServiceListeners) {
-                listener.onUpdateNodes(sceneId, ids);
+                listener.onSetNodesDynamic(sceneId, ids);
             }
         }
     }
@@ -253,7 +253,7 @@ public class SceneServiceImpl implements SceneService {
         }
         synchronized (sceneServiceListeners) {
             for (final SceneServiceListener listener : sceneServiceListeners) {
-                listener.onUpdateNodes(sceneId, ids);
+                listener.onSetNodesDynamic(sceneId, ids, indexes);
             }
         }
     }
@@ -272,7 +272,7 @@ public class SceneServiceImpl implements SceneService {
         }
         synchronized (sceneServiceListeners) {
             for (final SceneServiceListener listener : sceneServiceListeners) {
-                listener.onUpdateNodes(sceneId, ids);
+                listener.onSetNodesStatic(sceneId, ids);
             }
         }
     }

@@ -159,6 +159,28 @@ public class SceneController implements SceneServiceListener {
     }
 
     @Override
+    public void onSetNodesDynamic(UUID sceneId, List<UUID> ids) {
+
+    }
+
+    @Override
+    public void onSetNodesDynamic(UUID sceneId, List<UUID> ids, List<Integer> indexes) {
+        for (final SceneNode dynamicNode : dynamicNodes) {
+            for (int i = 0; i < ids.size(); i++) {
+                final UUID id = ids.get(i);
+                if (dynamicNode.getId().equals(id)) {
+                    dynamicNode.setIndex(indexes.get(i));
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onSetNodesStatic(UUID sceneId, List<UUID> ids) {
+
+    }
+
+    @Override
     public void onPlayNodeAudio(UUID sceneId, UUID nodeId, byte[] bytes) {
         //LOGGER.info("Client received node audio: " + nodeId + " (" + bytes.length + ")");
         sceneContext.getAudioPlaybackController().playAudio(sceneId, nodeId, bytes);
@@ -180,12 +202,12 @@ public class SceneController implements SceneServiceListener {
 
     public void addNodes(List<SceneNode> nodes) {
         for (final SceneNode node : nodes) {
-            for (SceneNode ownNode : dynamicNodes) {
+            /*for (SceneNode ownNode : dynamicNodes) {
                 if (ownNode.getId().equals(node.getId())) {
                     LOGGER.debug("Updated node index: " + node.getId() + ":" + node.getIndex());
                     ownNode.setIndex(node.getIndex());
                 }
-            }
+            }*/
             if (sceneContext.getCharacter().getSceneNode().getId().equals(node.getId())) {
                 continue;
             }
@@ -463,7 +485,11 @@ public class SceneController implements SceneServiceListener {
 
     public void removeDynamicNode(final SceneNode sceneNode) {
         final List<SceneNode> modifiedDynamicNodes = Collections.synchronizedList(new ArrayList<>(dynamicNodes));
-        modifiedDynamicNodes.remove(sceneNode);
+        for (final SceneNode candidate : new ArrayList<SceneNode>(modifiedDynamicNodes)) {
+            if (candidate.getId().equals(sceneNode.getId())) {
+                modifiedDynamicNodes.remove(candidate);
+            }
+        }
         dynamicNodes = modifiedDynamicNodes;
     }
 
@@ -562,7 +588,7 @@ public class SceneController implements SceneServiceListener {
                 final List<SceneNode> nodes = clientRpcService.getNodes(scene.getId(), Arrays.asList(nodeId));
                 if (nodes.size() == 1) {
 
-                    editedNode = nodes.get(0);
+                    editedNode = nodes.get(0).clone();
                     addDynamicNode(editedNode);
                     networkController.setNodesDynamic(scene, Arrays.asList(editedNode.getId()));
 

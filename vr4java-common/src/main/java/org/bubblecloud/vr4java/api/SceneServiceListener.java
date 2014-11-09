@@ -1,5 +1,7 @@
 package org.bubblecloud.vr4java.api;
 
+import org.bubblecloud.vr4java.rpc.RpcEvent;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +17,12 @@ public interface SceneServiceListener {
     void onRemoveNodes(final UUID sceneId, final List<UUID> nodeIds);
 
     void onStateSlug(final UUID sceneId, final List<UUID> nodeIds);
+
+    public void onSetNodesDynamic(final UUID sceneId, final List<UUID> ids);
+
+    public void onSetNodesDynamic(final UUID sceneId, final List<UUID> ids, final List<Integer> indexes);
+
+    public void onSetNodesStatic(final UUID sceneId, final List<UUID> ids);
 
     void onPlayNodeAudio(final UUID sceneId, final UUID nodeId, final byte[] bytes);
 }
