@@ -84,14 +84,8 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
         LOGGER.info("Client connect: " + remoteFingerprint + " (" + this.toString() + ")");
         for (final ServerRpcService service : services) {
             if (service.getRemoteFingerprint().equals(remoteFingerprint)) {
-                try {
-                    LOGGER.warn("Already connected: " + remoteFingerprint);
-                    getSession().close();
-                    service.getSession().close();
-                } catch (IOException e) {
-                    LOGGER.warn("Error closing new session with client already connected: " + remoteFingerprint);
-                }
-                return;
+                LOGGER.warn("Disconnecting already connected " + remoteFingerprint);
+                service.onDisconnect(service.getRemoteFingerprint(), null);
             }
         }
         this.remoteFingerprint = remoteFingerprint;
@@ -144,6 +138,11 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
             LOGGER.info("Client non persistent nodes evicted: " + remoteFingerprint + " (" + nodesToRemove + ")");
         }
 
+        try {
+            getSession().close();
+        } catch (final Exception e) {
+            LOGGER.error("Error closing disconnected session.", e);
+        }
     }
 
     @Override

@@ -493,7 +493,7 @@ public class SceneController implements SceneServiceListener {
             LOGGER.warn("Not editing a node.");
             return;
         }
-        final org.bubblecloud.vecmath.Quaternion orientation = editedNode.getInterpolatedRotation();
+        final org.bubblecloud.vecmath.Quaternion orientation = editedNode.getRotation();
         final org.bubblecloud.vecmath.Quaternion rotation = new org.bubblecloud.vecmath.Quaternion(rotation_.getX(),
                 rotation_.getY(), rotation_.getZ(), rotation_.getW());
         final org.bubblecloud.vecmath.Quaternion newOrientation = orientation.mult(rotation);

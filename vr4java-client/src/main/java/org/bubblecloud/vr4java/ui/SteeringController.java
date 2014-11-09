@@ -6,6 +6,8 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.input.event.*;
+import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Spatial;
@@ -36,17 +38,13 @@ public class SteeringController implements ActionListener, RawInputListener {
         this.camera = sceneContext.getCamera();
         inputManager.addRawInputListener(this);
         inputManager.addMapping("Strafe Left",
-                new KeyTrigger(KeyInput.KEY_A),
-                new KeyTrigger(KeyInput.KEY_LEFT));
+                new KeyTrigger(KeyInput.KEY_A));
         inputManager.addMapping("Strafe Right",
-                new KeyTrigger(KeyInput.KEY_D),
-                new KeyTrigger(KeyInput.KEY_RIGHT));
+                new KeyTrigger(KeyInput.KEY_D));
         inputManager.addMapping("Walk Forward",
-                new KeyTrigger(KeyInput.KEY_W),
-                new KeyTrigger(KeyInput.KEY_UP));
+                new KeyTrigger(KeyInput.KEY_W));
         inputManager.addMapping("Walk Backward",
-                new KeyTrigger(KeyInput.KEY_S),
-                new KeyTrigger(KeyInput.KEY_DOWN));
+                new KeyTrigger(KeyInput.KEY_S));
         inputManager.addMapping("Jump",
                 new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addMapping("Shoot",
@@ -218,6 +216,7 @@ public class SteeringController implements ActionListener, RawInputListener {
 
     private boolean pressToTalkDown = false;
     private final float GRID_STEP = 0.1f;
+    private final float GRID_ROTATION_STEP = 10f / 180f * FastMath.PI;
 
     @Override
     public void onKeyEvent(KeyInputEvent evt) {
@@ -257,6 +256,24 @@ public class SteeringController implements ActionListener, RawInputListener {
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD3 && evt.isReleased()) {
             sceneContext.getSceneController().translateEditNode(new Vector3f(0, GRID_STEP, 0));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_LEFT && evt.isReleased()) {
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(GRID_ROTATION_STEP, new Vector3f(1f, 0, 0)));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_RIGHT && evt.isReleased()) {
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-GRID_ROTATION_STEP, new Vector3f(1f, 0, 0)));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_UP && evt.isReleased()) {
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(GRID_ROTATION_STEP, new Vector3f(0, 1f, 0)));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_DOWN && evt.isReleased()) {
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-GRID_ROTATION_STEP, new Vector3f(0, 1f, 0)));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_7 && evt.isReleased()) {
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(GRID_ROTATION_STEP, new Vector3f(0, 0, 1f)));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_9 && evt.isReleased()) {
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-GRID_ROTATION_STEP, new Vector3f(0, 0, 1f)));
         }
     }
 

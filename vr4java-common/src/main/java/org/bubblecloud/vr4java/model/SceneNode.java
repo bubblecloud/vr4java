@@ -611,6 +611,12 @@ public class SceneNode {
     }
 
     @JsonIgnore
+    public Quaternion getRotation() {
+        return new Quaternion(ax/10000f, ay/10000f, az/10000f, aw/10000f);
+    }
+
+
+    @JsonIgnore
     public Vector3f getInterpolatedTranslation() {
         return interpolatedTranslation;
     }
