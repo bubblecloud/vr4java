@@ -145,7 +145,8 @@ public class SceneRepository {
 
         if (serverContext.getUser() != null && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
                 serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
-                PRIVILEGE_ADMINISTRATE, sceneId.toString())) {
+                PRIVILEGE_ADMINISTRATE, sceneId.toString())
+                && !serverContext.getRoles().contains("administrator")) {
             throw new SecurityException("User " + serverContext.getUser().getUserId() + " node save denied to scene: " + sceneId);
         }
 

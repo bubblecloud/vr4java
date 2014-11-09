@@ -81,7 +81,7 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
 
     @Override
     public void onConnect(final String remoteFingerprint, final X509Certificate remoteCertificate) {
-        LOGGER.info("Client connect: " + remoteFingerprint + " (" + this.toString() + ")");
+        LOGGER.info("Client connect: " + remoteFingerprint);
         for (final ServerRpcService service : services) {
             if (service.getRemoteFingerprint().equals(remoteFingerprint)) {
                 LOGGER.warn("Disconnecting already connected " + remoteFingerprint);
@@ -112,6 +112,9 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
                 getSealer().getFingerprint(),
                 remoteFingerprint,
                 company, user, uri);
+
+        LOGGER.info("User authenticated as " + serverContext.getUser().getFirstName() + " " + serverContext.getUser().getLastName() +
+            " with roles: " + serverContext.getRoles() + " (" + remoteFingerprint + ")");
 
         sceneRepository = new SceneRepository(serverContext);
     }
@@ -280,7 +283,7 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
     }
 
     public User addUser(final EntityManager entityManager, final Company company, String remoteFingerprint, X509Certificate remoteCertificate) {
-        LOGGER.info("Adding user for client: " + remoteFingerprint);
+        LOGGER.info("Adding user for client: " + remoteCertificate.getSubjectDN().getName() + "(" + remoteFingerprint + ")");
 
         final String encodedRemoteCertifcate;
         try {
@@ -290,7 +293,7 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
             throw new SecurityException("Error encoding TSL client certificate for finding user from database.");
         }
 
-        final String[] nameParts = remoteCertificate.getSubjectDN().getName().split(" ");
+        final String[] nameParts = remoteCertificate.getSubjectDN().getName().replace("CN=", "").split(" ");
 
         final User user = new User();
         user.setOwner(company);
