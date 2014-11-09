@@ -39,7 +39,7 @@ public class CharacterAnimator {
         final Vector3f viewDirection = steeringController.getCharacterControl().getViewDirection().normalize();
         final Vector3f walkDirection = steeringController.getCharacterControl().getWalkDirection().normalize();
         if (walkDirection.length() > 0.01) {
-            animate(ANIMATION_WALK, 1.0f, 0.25f);
+            animate(ANIMATION_WALK, 2.0f, 0.25f);
             lastUserControlTimeMillis = System.currentTimeMillis();
         } else {
             if (System.currentTimeMillis() -  lastUserControlTimeMillis > IDLE_TIME_MILLIS) {

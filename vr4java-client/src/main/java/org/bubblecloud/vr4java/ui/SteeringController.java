@@ -34,12 +34,12 @@ public class SteeringController implements ActionListener, RawInputListener {
         this.inputManager = sceneContext.getInputManager();
         this.camera = sceneContext.getCamera();
         inputManager.addRawInputListener(this);
-        /*inputManager.addMapping("Strafe Left",
+        inputManager.addMapping("Strafe Left",
                 new KeyTrigger(KeyInput.KEY_A),
                 new KeyTrigger(KeyInput.KEY_LEFT));
         inputManager.addMapping("Strafe Right",
                 new KeyTrigger(KeyInput.KEY_D),
-                new KeyTrigger(KeyInput.KEY_RIGHT));*/
+                new KeyTrigger(KeyInput.KEY_RIGHT));
         inputManager.addMapping("Walk Forward",
                 new KeyTrigger(KeyInput.KEY_W),
                 new KeyTrigger(KeyInput.KEY_UP));
@@ -87,7 +87,7 @@ public class SteeringController implements ActionListener, RawInputListener {
 
         final float timeDelta = tpf;
         final float angularVelocity = 60f * ( (float) Math.PI / 180f); // degrees per second in radians
-        final float speed = 1.0f; // meters per second
+        final float speed = 2.0f; // meters per second
 
         final float deltaAngle = angularVelocity * timeDelta;
         final float distanceDelta = speed * timeDelta;
