@@ -17,6 +17,7 @@ public class SceneServiceImpl implements SceneService {
     private final Map<UUID, SceneModel> models = Collections.synchronizedMap(new HashMap<UUID, SceneModel>());
     private final List<SceneServiceListener> sceneServiceListeners = new ArrayList<>();
 
+
     @Override
     public void addSceneServiceListener(final SceneServiceListener sceneServiceListener) {
         synchronized (sceneServiceListeners) {
@@ -272,6 +273,16 @@ public class SceneServiceImpl implements SceneService {
         synchronized (sceneServiceListeners) {
             for (final SceneServiceListener listener : sceneServiceListeners) {
                 listener.onUpdateNodes(sceneId, ids);
+            }
+        }
+    }
+
+
+    @Override
+    public void playNodeAudio(UUID sceneId, UUID nodeId, byte[] bytes) {
+        synchronized (sceneServiceListeners) {
+            for (final SceneServiceListener listener : sceneServiceListeners) {
+                listener.onPlayNodeAudio(sceneId, nodeId, bytes);
             }
         }
     }

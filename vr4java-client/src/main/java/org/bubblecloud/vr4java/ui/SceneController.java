@@ -156,6 +156,11 @@ public class SceneController implements SceneServiceListener {
         }
     }
 
+    @Override
+    public void onPlayNodeAudio(UUID sceneId, UUID nodeId, byte[] bytes) {
+
+    }
+
     public void updateSpatialTransformation(SceneNode node, Spatial spatial) {
         spatial.setLocalTranslation(new Vector3f(
                 node.getX() / 1000f,

@@ -327,4 +327,29 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
         return packageIds;
     }
 
+    @Override
+    public void playNodeAudio(UUID sceneId, UUID nodeId, byte[] bytes) {
+        LOGGER.debug("Server broadcasting play node audio for scene: " + sceneId + " node: " + nodeId);
+        final Scene scene = getScene(sceneId);
+        if (scene == null) {
+            LOGGER.warn("Attempt to play node audio at none existent scene: " + sceneId);
+            return;
+        }
+        final List<SceneNode> nodes = getNodes(sceneId, Arrays.asList(nodeId));
+        if (nodes.size() == 0) {
+            LOGGER.warn("Attempt to play node audio from none existent node: " + nodeId);
+            return;
+        }
+        if (!remoteFingerprint.equals(nodes.get(0).getOwnerCertificateFingerprint())) {
+            LOGGER.warn("Attempt to play node audio without proper owner certificate fingerprint.");
+            return;
+        }
+        for (final ServerRpcService service : services) {
+            try {
+                service.getClientService().playNodeAudio(sceneId, nodeId, bytes);
+            } catch (final Exception e) {
+                LOGGER.warn("Error sending state slug to client: " + service.getRemoteFingerprint());
+            }
+        }
+    }
 }

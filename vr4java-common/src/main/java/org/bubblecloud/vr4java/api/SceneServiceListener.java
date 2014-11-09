@@ -16,4 +16,5 @@ public interface SceneServiceListener {
 
     void onStateSlug(final UUID sceneId, final List<UUID> nodeIds);
 
+    void onPlayNodeAudio(final UUID sceneId, final UUID nodeId, final byte[] bytes);
 }

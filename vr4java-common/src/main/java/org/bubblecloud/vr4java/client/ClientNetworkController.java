@@ -173,6 +173,11 @@ public class ClientNetworkController {
         serverSceneService.addNodes(scene.getId(), nodeList);
     }
 
+    public void playNodeAudio(UUID sceneId, UUID nodeId, byte[] bytes) {
+        LOGGER.debug("Client sending play node audio for scene: " + sceneId + " node: " + nodeId);
+        serverSceneService.playNodeAudio(sceneId, nodeId, bytes);
+    }
+
     public void stop() {
         try {
             client.stop();

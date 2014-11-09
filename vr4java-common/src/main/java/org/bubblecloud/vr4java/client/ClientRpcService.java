@@ -63,6 +63,11 @@ public class ClientRpcService implements SceneService, MessageHandler {
     }
 
     @Override
+    public void playNodeAudio(UUID sceneId, UUID nodeId, byte[] bytes) {
+        sceneService.playNodeAudio(sceneId, nodeId, bytes);
+    }
+
+    @Override
     public void addSceneServiceListener(SceneServiceListener sceneServiceListener) {
         sceneService.addSceneServiceListener(sceneServiceListener);
     }

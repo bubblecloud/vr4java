@@ -40,7 +40,7 @@ public interface SceneService {
     @RpcMethod
     public Collection<SceneNode> getNodes(final UUID sceneId);
 
-    @RpcEvent
+    @RpcMethod
     public List<SceneNode> getNodes(final UUID sceneId, final List<UUID> ids);
 
     @RpcEvent
@@ -61,4 +61,12 @@ public interface SceneService {
     @RpcEvent
     public void setNodesStatic(final UUID sceneId, final List<UUID> ids);
 
+    /**
+     * Plays node audio. Bytes of length 0 signals end of stream.
+     * @param sceneId
+     * @param nodeId
+     * @param bytes
+     */
+    @RpcEvent
+    public void playNodeAudio(final UUID sceneId, final UUID nodeId, final byte[] bytes);
 }
