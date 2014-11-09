@@ -178,11 +178,16 @@ public class SceneController implements SceneServiceListener {
 
     public void addNodes(List<SceneNode> nodes) {
         for (final SceneNode node : nodes) {
+            boolean local = false;
             for (SceneNode ownNode : dynamicNodes) {
                 if (ownNode.getId().equals(node.getId())) {
                     LOGGER.debug("Updated node index: " + node.getId() + ":" + node.getIndex());
                     ownNode.setIndex(node.getIndex());
+                    local = true;
                 }
+            }
+            if (local) {
+                continue;
             }
 
             if (node instanceof AmbientLightNode) {
@@ -232,6 +237,9 @@ public class SceneController implements SceneServiceListener {
             final Spatial spatial = spatials.get(nodeId);
             if (spatial != null) {
                 rootNode.detachChild(spatial);
+            }
+            if (animationControllers.containsKey(nodeId)) {
+                animationControllers.remove(nodeId);
             }
             spatials.remove(nodeId);
         }
@@ -404,10 +412,8 @@ public class SceneController implements SceneServiceListener {
         final String name = "Character";
         final String modelName = "jme3-open-asset-pack-v1/character/human/male/ogre/male.scene";
 
-
         final Spatial model = assetManager.loadModel(modelName);
         final com.jme3.scene.Node characterNode = new com.jme3.scene.Node(name);
-        characterNode.attachChild(model);
         rootNode.attachChild(characterNode);
         characterNode.attachChild(model);
 

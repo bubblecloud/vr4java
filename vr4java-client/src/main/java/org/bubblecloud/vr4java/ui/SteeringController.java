@@ -70,7 +70,7 @@ public class SteeringController implements ActionListener, RawInputListener {
         ChaseCamera chaseCam = new ChaseCamera(camera, characterSpatial, inputManager);
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setDefaultDistance(10f);
-        chaseCam.setLookAtOffset(Vector3f.UNIT_Y.mult(3));
+        chaseCam.setLookAtOffset(Vector3f.UNIT_Y.mult(2));
     }
 
     public BetterCharacterControl getCharacterControl() {
