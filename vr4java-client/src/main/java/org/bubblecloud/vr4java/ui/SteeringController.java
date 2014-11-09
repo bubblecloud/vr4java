@@ -1,21 +1,22 @@
 package org.bubblecloud.vr4java.ui;
 
 import com.jme3.bullet.control.BetterCharacterControl;
-import com.jme3.input.ChaseCamera;
-import com.jme3.input.InputManager;
-import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
+import com.jme3.input.*;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.input.event.*;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Spatial;
+import org.apache.log4j.Logger;
 
 /**
  * Created by tlaukkan on 9/24/2014.
  */
-public class SteeringController implements ActionListener {
+public class SteeringController implements ActionListener, RawInputListener {
+    private static final Logger LOGGER = Logger.getLogger(SteeringController.class.getName());
+
     private final InputManager inputManager;
     private final Camera camera;
     private Character character;
@@ -30,7 +31,7 @@ public class SteeringController implements ActionListener {
         // Add a physics character to the world
         this.inputManager = sceneContext.getInputManager();
         this.camera = sceneContext.getCamera();
-
+        inputManager.addRawInputListener(this);
         /*inputManager.addMapping("Strafe Left",
                 new KeyTrigger(KeyInput.KEY_A),
                 new KeyTrigger(KeyInput.KEY_LEFT));
@@ -140,6 +141,14 @@ public class SteeringController implements ActionListener {
         }
     }
 
+    public void onTalkBegin() {
+        LOGGER.info("Talk begin.");
+    }
+
+    public void onTalkEnd() {
+        LOGGER.info("Talk end.");
+    }
+
     public boolean isLeftStrafe() {
         return leftStrafe;
     }
@@ -170,5 +179,58 @@ public class SteeringController implements ActionListener {
 
     public void setBackward(boolean backward) {
         this.backward = backward;
+    }
+
+    @Override
+    public void beginInput() {
+
+    }
+
+    @Override
+    public void endInput() {
+
+    }
+
+    @Override
+    public void onJoyAxisEvent(JoyAxisEvent evt) {
+
+    }
+
+    @Override
+    public void onJoyButtonEvent(JoyButtonEvent evt) {
+
+    }
+
+    @Override
+    public void onMouseMotionEvent(MouseMotionEvent evt) {
+
+    }
+
+    @Override
+    public void onMouseButtonEvent(MouseButtonEvent evt) {
+
+    }
+
+    private boolean pressToTalkDown = false;
+
+    @Override
+    public void onKeyEvent(KeyInputEvent evt) {
+        if (evt.getKeyCode() == KeyInput.KEY_LCONTROL) {
+            if (evt.isPressed()) {
+                if (!pressToTalkDown) {
+                    pressToTalkDown = true;
+                    onTalkBegin();
+                }
+            }
+            if (evt.isReleased()) {
+                pressToTalkDown = false;
+                onTalkEnd();
+            }
+        }
+    }
+
+    @Override
+    public void onTouchEvent(TouchEvent evt) {
+
     }
 }
