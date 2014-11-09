@@ -35,7 +35,7 @@ public final class SceneDaoTest {
 
     @Before
     public void before() throws Exception {
-        TestUtil.before("vr4java", "vr4java-server");
+        TestUtil.before("vr4java", "vr4java-test");
         entityManager = TestUtil.getEntityManagerFactory().createEntityManager();
         company = CompanyDao.getCompany(entityManager, "*");
     }
