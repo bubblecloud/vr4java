@@ -44,6 +44,7 @@ public class SceneRepository {
             }
 
             final Scene scene = new Scene();
+            scene.setId(UUID.randomUUID());
             scene.setOwner(serverContext.getCompany());
             scene.setOwnerCertificateFingerprint(serverContext.getServerCertificateFingerprint());
             scene.setName("default");
@@ -60,6 +61,7 @@ public class SceneRepository {
             final ColorRGBA lightColor = ColorRGBA.LightGray;
             final SceneNode directionalLightNode = new DirectionalLightNode(-0.37352666f, -0.50444174f, -0.7784704f,
                     lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), lightColor.getAlpha());
+            directionalLightNode.setId(UUID.randomUUID());
             directionalLightNode.setScene(scene);
             directionalLightNode.setName("directional light");
             directionalLightNode.setOwner(serverContext.getCompany());
@@ -68,6 +70,7 @@ public class SceneRepository {
 
             final SceneNode ambientLightNode = new AmbientLightNode(
                     lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), lightColor.getAlpha());
+            ambientLightNode.setId(UUID.randomUUID());
             ambientLightNode.setScene(scene);
             ambientLightNode.setName("ambient light");
             ambientLightNode.setOwner(serverContext.getCompany());
@@ -76,6 +79,7 @@ public class SceneRepository {
 
             final SceneNode floorNode = new CuboidNode(50f, 0.25f, 50f, 1.0f,
                     "jme3-open-asset-pack-v1/textures/rose_fisher_collage3_noncommercia.jpg");
+            floorNode.setId(UUID.randomUUID());
             floorNode.setScene(scene);
             floorNode.setName("floor");
             floorNode.setOwner(serverContext.getCompany());
@@ -86,6 +90,7 @@ public class SceneRepository {
 
             final SceneNode torusNode = new TorusNode(30, 30, 20, 40, 1.0f,
                     "jme3-open-asset-pack-v1/textures/rose_fisher_collage3_noncommercia.jpg");
+            torusNode.setId(UUID.randomUUID());
             torusNode.setScene(scene);
             torusNode.setName("torus");
             torusNode.setOwner(serverContext.getCompany());
