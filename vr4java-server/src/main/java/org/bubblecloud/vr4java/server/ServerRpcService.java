@@ -290,11 +290,13 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
             throw new SecurityException("Error encoding TSL client certificate for finding user from database.");
         }
 
+        final String[] nameParts = remoteCertificate.getSubjectDN().getName().split(" ");
+
         final User user = new User();
         user.setOwner(company);
         user.setEmailAddress(remoteFingerprint);
-        user.setFirstName("");
-        user.setLastName("");
+        user.setFirstName(nameParts.length > 0 ? nameParts[0] : "");
+        user.setLastName(nameParts.length > 1 ? nameParts[1] : "");
         user.setPhoneNumber("");
         user.setPasswordHash("");
         user.setCertificate(encodedRemoteCertifcate);

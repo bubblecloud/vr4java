@@ -51,7 +51,7 @@ public class ClientNetworkController {
     public ClientNetworkController() {
         final URI uri = URI.create(rpcUrl);
         clientService = new ClientRpcService();
-        client = new RpcWsClient("test-echo-client", uri, clientService, clientService);
+        client = new RpcWsClient( PropertiesUtil.getProperty("vr4java-client", "user-name"), uri, clientService, clientService);
     }
 
     public UUID calculateGlobalId(final String identifier) {

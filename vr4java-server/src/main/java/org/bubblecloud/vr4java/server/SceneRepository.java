@@ -146,7 +146,7 @@ public class SceneRepository {
         if (serverContext.getUser() != null && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
                 serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
                 PRIVILEGE_ADMINISTRATE, sceneId.toString())) {
-            throw new SecurityException("User " + serverContext.getUser() + " node save denied to scene: " + sceneId);
+            throw new SecurityException("User " + serverContext.getUser().getUserId() + " node save denied to scene: " + sceneId);
         }
 
         SceneNodeDao.addSceneNodes(serverContext.getEntityManager(), nodesToAdd);

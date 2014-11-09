@@ -239,6 +239,10 @@ public class SteeringController implements ActionListener, RawInputListener {
         if (evt.getKeyCode() == KeyInput.KEY_SUBTRACT && evt.isReleased()) {
             sceneContext.getSceneController().removeEditNode();
         }
+        if (evt.getKeyCode() == KeyInput.KEY_RETURN && evt.isReleased()) {
+            sceneContext.getSceneController().saveEditNode();
+        }
+
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD8 && evt.isReleased()) {
             sceneContext.getSceneController().translateEditNode(new Vector3f(-GRID_STEP, 0, 0));
         }

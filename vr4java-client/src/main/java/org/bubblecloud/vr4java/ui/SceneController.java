@@ -517,4 +517,17 @@ public class SceneController implements SceneServiceListener {
         editedNode = null;
     }
 
+    public void saveEditNode() {
+        if (editedNode == null) {
+            LOGGER.warn("Not editing a node.");
+            return;
+        }
+
+        removeDynamicNode(editedNode);
+        editedNode.setPersistent(true);
+        networkController.addNodes(scene, Arrays.asList(editedNode));
+
+        editedNode = null;
+    }
+
 }
