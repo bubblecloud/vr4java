@@ -115,6 +115,7 @@ public class VrClient extends SimpleApplication {
         assetManager.registerLocator("assets", FileLocator.class);
 
         sceneContext = new SceneContext();
+        sceneContext.setAudioRecordController(new AudioRecordController(sceneContext));
         sceneContext.setClientNetworkController(clientNetworkController);
         sceneContext.setInputManager(inputManager);
         sceneContext.setAssetManager(assetManager);

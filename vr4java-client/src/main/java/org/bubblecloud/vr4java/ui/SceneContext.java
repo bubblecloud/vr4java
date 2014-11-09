@@ -21,6 +21,8 @@ public class SceneContext {
     private ClientNetworkController clientNetworkController;
     private SteeringController steeringController;
     private SceneController sceneController;
+    private AudioRecordController audioRecordController;
+
     private Character character;
 
     public InputManager getInputManager() {
@@ -93,5 +95,13 @@ public class SceneContext {
 
     public void setRootNode(Node rootNode) {
         this.rootNode = rootNode;
+    }
+
+    public AudioRecordController getAudioRecordController() {
+        return audioRecordController;
+    }
+
+    public void setAudioRecordController(AudioRecordController audioRecordController) {
+        this.audioRecordController = audioRecordController;
     }
 }

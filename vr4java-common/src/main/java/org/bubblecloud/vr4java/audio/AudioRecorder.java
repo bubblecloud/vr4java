@@ -53,6 +53,11 @@ public class AudioRecorder {
         }
         shutdownRequested = true;
         recordThread.interrupt();
+        try {
+            recordThread.join();
+        } catch (final InterruptedException e) {
+            LOGGER.error("Interrupted while waiting audio record thread to exit.");
+        }
     }
 
     private void process() {

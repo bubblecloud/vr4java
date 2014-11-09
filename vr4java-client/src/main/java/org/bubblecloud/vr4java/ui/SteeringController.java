@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 public class SteeringController implements ActionListener, RawInputListener {
     private static final Logger LOGGER = Logger.getLogger(SteeringController.class.getName());
 
+    private final SceneContext sceneContext;
     private final InputManager inputManager;
     private final Camera camera;
     private Character character;
@@ -29,6 +30,7 @@ public class SteeringController implements ActionListener, RawInputListener {
 
     public SteeringController(final SceneContext sceneContext) {
         // Add a physics character to the world
+        this.sceneContext = sceneContext;
         this.inputManager = sceneContext.getInputManager();
         this.camera = sceneContext.getCamera();
         inputManager.addRawInputListener(this);
@@ -143,10 +145,12 @@ public class SteeringController implements ActionListener, RawInputListener {
 
     public void onTalkBegin() {
         LOGGER.info("Talk begin.");
+        sceneContext.getAudioRecordController().beginAudioRecord();
     }
 
     public void onTalkEnd() {
         LOGGER.info("Talk end.");
+        sceneContext.getAudioRecordController().endAudioRecord();
     }
 
     public boolean isLeftStrafe() {
