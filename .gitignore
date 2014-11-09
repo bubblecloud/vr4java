@@ -16,7 +16,7 @@ dist/
 certificate-*
 *.dll
 *.jks
-*.log
+*.log*
 assets/
 asset-cache/
 repo/
