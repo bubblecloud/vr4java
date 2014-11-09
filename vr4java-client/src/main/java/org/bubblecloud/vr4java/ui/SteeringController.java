@@ -6,13 +6,13 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.input.event.*;
-import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Spatial;
 import org.apache.log4j.Logger;
 import org.bubblecloud.vr4java.model.NodeType;
+import org.bubblecloud.vr4java.util.VrConstants;
 
 /**
  * Created by tlaukkan on 9/24/2014.
@@ -215,8 +215,6 @@ public class SteeringController implements ActionListener, RawInputListener {
     }
 
     private boolean pressToTalkDown = false;
-    private final float GRID_STEP = 0.1f;
-    private final float GRID_ROTATION_STEP = 5f / 180f * FastMath.PI;
 
     @Override
     public void onKeyEvent(KeyInputEvent evt) {
@@ -244,40 +242,40 @@ public class SteeringController implements ActionListener, RawInputListener {
         }
 
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD8 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(-GRID_STEP, 0, 0));
+            sceneContext.getSceneController().translateEditNode(new Vector3f(-VrConstants.GRID_STEP_TRANSLATION, 0, 0));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD2 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(GRID_STEP, 0, 0));
+            sceneContext.getSceneController().translateEditNode(new Vector3f(VrConstants.GRID_STEP_TRANSLATION, 0, 0));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD4 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(0, 0, GRID_STEP));
+            sceneContext.getSceneController().translateEditNode(new Vector3f(0, 0, VrConstants.GRID_STEP_TRANSLATION));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD6 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(0, 0, -GRID_STEP));
+            sceneContext.getSceneController().translateEditNode(new Vector3f(0, 0, -VrConstants.GRID_STEP_TRANSLATION));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD1 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(0, -GRID_STEP, 0));
+            sceneContext.getSceneController().translateEditNode(new Vector3f(0, -VrConstants.GRID_STEP_TRANSLATION, 0));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD3 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(0, GRID_STEP, 0));
+            sceneContext.getSceneController().translateEditNode(new Vector3f(0, VrConstants.GRID_STEP_TRANSLATION, 0));
         }
         if (evt.getKeyCode() == KeyInput.KEY_LEFT && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(GRID_ROTATION_STEP, new Vector3f(0, 1f, 0)));
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_RIGHT && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-GRID_ROTATION_STEP, new Vector3f(0, 1f, 0)));
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_UP && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(GRID_ROTATION_STEP, new Vector3f(0, 0, 1f)));
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 0, 1f)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_DOWN && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-GRID_ROTATION_STEP, new Vector3f(0, 0, 1f)));
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 0, 1f)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_PGDN && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-GRID_ROTATION_STEP, new Vector3f(1f, 0, 0)));
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(1f, 0, 0)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_END && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(GRID_ROTATION_STEP, new Vector3f(1f, 0, 0)));
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(1f, 0, 0)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_HOME && evt.isReleased()) {
             sceneContext.getSceneController().resetEditNodeRotation();

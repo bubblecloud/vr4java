@@ -22,6 +22,7 @@ import org.bubblecloud.vr4java.api.SceneServiceListener;
 import org.bubblecloud.vr4java.client.ClientNetworkController;
 import org.bubblecloud.vr4java.client.ClientRpcService;
 import org.bubblecloud.vr4java.model.*;
+import org.bubblecloud.vr4java.util.VrConstants;
 import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import java.util.*;
@@ -304,6 +305,17 @@ public class SceneController implements SceneServiceListener {
                     rigidBodyControl.setPhysicsRotation(spatial.getWorldRotation());
                 }
 
+                if (spatial instanceof  Geometry) {
+                    final Material material = ((Geometry) spatial).getMaterial();
+                    final boolean wireframe = material.getAdditionalRenderState().isWireframe();
+                    final boolean edited = editedNode != null && sceneNode.getId().equals(editedNode.getId());
+                    if (edited && !wireframe) {
+                        material.getAdditionalRenderState().setWireframe(true);
+                    } else if (!edited && wireframe) {
+                        material.getAdditionalRenderState().setWireframe(false);
+                    }
+                }
+
             }
 
         }
@@ -469,9 +481,9 @@ public class SceneController implements SceneServiceListener {
             final Vector3f nodeLocation = characterLocation.add(
                     sceneContext.getCharacter().getCharacterControl().getViewDirection().normalize().mult(2f));
             editedNode.setTranslation(new org.bubblecloud.vecmath.Vector3f(
-                    nodeLocation.getX(),
-                    nodeLocation.getY(),
-                    nodeLocation.getZ()
+                    nodeLocation.getX() - nodeLocation.getX() % VrConstants.GRID_STEP_TRANSLATION,
+                    nodeLocation.getY() - nodeLocation.getY() % VrConstants.GRID_STEP_TRANSLATION,
+                    nodeLocation.getZ() - nodeLocation.getZ() % VrConstants.GRID_STEP_TRANSLATION
             ));
             editedNode.setRotation(new org.bubblecloud.vecmath.Quaternion());
             editedNode.setPersistent(false);
