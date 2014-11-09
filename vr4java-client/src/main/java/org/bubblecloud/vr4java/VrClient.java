@@ -28,74 +28,78 @@ public class VrClient extends SimpleApplication {
     private final ClientNetworkController clientNetworkController;
     private SceneContext sceneContext;
 
-    public static void main(String[] args) throws Exception {
-        java.util.logging.Logger.getLogger("").setLevel(Level.SEVERE);
+    public static void main(String[] args) {
+        try {
+            java.util.logging.Logger.getLogger("").setLevel(Level.SEVERE);
 
-        final File oldInstaller = new File("installer.jar");
-        final File newInstaller = new File("installer-new.jar");
+            final File oldInstaller = new File("installer.jar");
+            final File newInstaller = new File("installer-new.jar");
 
-        if (newInstaller.exists()) {
-            if (oldInstaller.exists() && newInstaller.lastModified() > oldInstaller.lastModified()) {
-                LOGGER.info("Deleting installer from the way of new installer.");
-                Thread.sleep(1000);
-                oldInstaller.delete();
-                Thread.sleep(1000);
-            }
-            if (!oldInstaller.exists()) {
-                LOGGER.info("Renaming new installer as installer.");
-                newInstaller.renameTo(oldInstaller);
-                if (oldInstaller.exists()) {
-                    LOGGER.info("Re-executing installer.");
-                    Runtime.getRuntime().exec("java -jar installer.jar");
-                    return;
+            if (newInstaller.exists()) {
+                if (oldInstaller.exists() && newInstaller.lastModified() > oldInstaller.lastModified()) {
+                    LOGGER.info("Deleting installer from the way of new installer.");
+                    Thread.sleep(1000);
+                    oldInstaller.delete();
+                    Thread.sleep(1000);
+                }
+                if (!oldInstaller.exists()) {
+                    LOGGER.info("Renaming new installer as installer.");
+                    newInstaller.renameTo(oldInstaller);
+                    if (oldInstaller.exists()) {
+                        LOGGER.info("Re-executing installer.");
+                        Runtime.getRuntime().exec("java -jar installer.jar");
+                        return;
+                    }
                 }
             }
-        }
 
-        final VrSplash vrSplash = new VrSplash();
+            final VrSplash vrSplash = new VrSplash();
 
-        final ClientNetworkController clientNetworkController = new ClientNetworkController();
-        try {
-            clientNetworkController.start(new ClientNetworkStartupListener() {
+            final ClientNetworkController clientNetworkController = new ClientNetworkController();
+            try {
+                clientNetworkController.start(new ClientNetworkStartupListener() {
+                    @Override
+                    public void message(String message) {
+                        vrSplash.render(message);
+                    }
+                });
+            } catch (final Exception e) {
+                LOGGER.error("Error connecting to server.", e);
+                return;
+            }
+
+            vrSplash.close();
+            final AppSettings appSettings = new AppSettings(true);
+            appSettings.setSamples(8);
+            appSettings.setVSync(true);
+
+            try {
+                appSettings.load("vr4java");
+            } catch (BackingStoreException e) {
+                LOGGER.info("Error loading settings", e);
+            }
+
+            final VrClient app = new VrClient(clientNetworkController);
+            app.setSettings(appSettings);
+            app.setShowSettings(true);
+            app.start();
+
+            final AppState shutdownAppState = new AbstractAppState() {
                 @Override
-                public void message(String message) {
-                    vrSplash.render(message);
+                public void cleanup() {
+                    try {
+                        appSettings.save("vr4java");
+                    } catch (BackingStoreException e) {
+                        LOGGER.info("Error saving settings", e);
+                    }
+                    clientNetworkController.stop();
                 }
-            });
-        } catch (final Exception e) {
-            LOGGER.error("Error connecting to server.", e);
-            return;
+            };
+            shutdownAppState.setEnabled(true);
+            app.getStateManager().attach(shutdownAppState);
+        } catch (final Throwable t) {
+            LOGGER.error("Error in VR client startup.", t);
         }
-
-        vrSplash.close();
-        final AppSettings appSettings = new AppSettings(true);
-        appSettings.setSamples(8);
-        appSettings.setVSync(true);
-
-        try {
-            appSettings.load("vr4java");
-        } catch (BackingStoreException e) {
-            LOGGER.info("Error loading settings", e);
-        }
-
-        final VrClient app = new VrClient(clientNetworkController);
-        app.setSettings(appSettings);
-        app.setShowSettings(true);
-        app.start();
-
-        final AppState shutdownAppState = new AbstractAppState() {
-            @Override
-            public void cleanup() {
-                try {
-                    appSettings.save("vr4java");
-                } catch (BackingStoreException e) {
-                    LOGGER.info("Error saving settings", e);
-                }
-                clientNetworkController.stop();
-            }
-        };
-        shutdownAppState.setEnabled(true);
-        app.getStateManager().attach(shutdownAppState);
     }
 
     public VrClient(ClientNetworkController clientNetworkController) {
