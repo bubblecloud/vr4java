@@ -216,7 +216,7 @@ public class SteeringController implements ActionListener, RawInputListener {
 
     private boolean pressToTalkDown = false;
     private final float GRID_STEP = 0.1f;
-    private final float GRID_ROTATION_STEP = 10f / 180f * FastMath.PI;
+    private final float GRID_ROTATION_STEP = 5f / 180f * FastMath.PI;
 
     @Override
     public void onKeyEvent(KeyInputEvent evt) {
@@ -258,22 +258,25 @@ public class SteeringController implements ActionListener, RawInputListener {
             sceneContext.getSceneController().translateEditNode(new Vector3f(0, GRID_STEP, 0));
         }
         if (evt.getKeyCode() == KeyInput.KEY_LEFT && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(GRID_ROTATION_STEP, new Vector3f(1f, 0, 0)));
-        }
-        if (evt.getKeyCode() == KeyInput.KEY_RIGHT && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-GRID_ROTATION_STEP, new Vector3f(1f, 0, 0)));
-        }
-        if (evt.getKeyCode() == KeyInput.KEY_UP && evt.isReleased()) {
             sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(GRID_ROTATION_STEP, new Vector3f(0, 1f, 0)));
         }
-        if (evt.getKeyCode() == KeyInput.KEY_DOWN && evt.isReleased()) {
+        if (evt.getKeyCode() == KeyInput.KEY_RIGHT && evt.isReleased()) {
             sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-GRID_ROTATION_STEP, new Vector3f(0, 1f, 0)));
         }
-        if (evt.getKeyCode() == KeyInput.KEY_7 && evt.isReleased()) {
+        if (evt.getKeyCode() == KeyInput.KEY_UP && evt.isReleased()) {
             sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(GRID_ROTATION_STEP, new Vector3f(0, 0, 1f)));
         }
-        if (evt.getKeyCode() == KeyInput.KEY_9 && evt.isReleased()) {
+        if (evt.getKeyCode() == KeyInput.KEY_DOWN && evt.isReleased()) {
             sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-GRID_ROTATION_STEP, new Vector3f(0, 0, 1f)));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_PGDN && evt.isReleased()) {
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-GRID_ROTATION_STEP, new Vector3f(1f, 0, 0)));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_END && evt.isReleased()) {
+            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(GRID_ROTATION_STEP, new Vector3f(1f, 0, 0)));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_HOME && evt.isReleased()) {
+            sceneContext.getSceneController().resetEditNodeRotation();
         }
     }
 
