@@ -142,8 +142,8 @@ public class SceneRepository {
                 sceneNode.setScene(scene);
                 sceneNode.setOwner(serverContext.getCompany());
                 final SceneNode savedNode = SceneNodeDao.getSceneNode(serverContext.getEntityManager(), sceneNode.getId());
-                serverContext.getEntityManager().detach(savedNode);
                 if (savedNode != null) {
+                    serverContext.getEntityManager().detach(savedNode);
                     sceneNode.setCreated(savedNode.getCreated());
                     sceneNode.setModified(new Date());
                     final SceneNode mergedNode = serverContext.getEntityManager().merge(sceneNode);
