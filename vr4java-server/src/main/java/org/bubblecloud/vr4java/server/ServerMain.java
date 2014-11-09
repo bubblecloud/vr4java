@@ -54,7 +54,7 @@ public class ServerMain {
 
     public void start() throws Exception {
 
-        PropertiesUtil.setCategoryRedirection("site", "vr4java-server");
+        PropertiesUtil.setCategoryRedirection("site", PROPERTIES_CATEGORY);
 
         // Configuration loading with HEROKU support.
         final String environmentDatabaseString = System.getenv("DATABASE_URL");
@@ -72,7 +72,7 @@ public class ServerMain {
         // Construct Jetty server with default Ilves server configuration.
         server = DefaultJettyConfiguration.configureServer(PERSISTENCE_UNIT, LOCALIZATION_BUNDLE);
 
-        serverIdentity = PropertiesUtil.getProperty("vr4java-server", "server-certificate-self-sign-host-name");
+        serverIdentity = PropertiesUtil.getProperty(PROPERTIES_CATEGORY, "server-certificate-self-sign-host-name");
         sealer = new RpcSealerImpl(serverIdentity);
         serverContext = ServerContext.buildLocalServerContext(serverIdentity);
         sceneRepository = new SceneRepository(serverContext);
