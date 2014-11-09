@@ -28,7 +28,7 @@ public class ClientServerTest {
 
     @Before
     public void before() throws Exception {
-        PropertiesUtil.setCategoryRedirection("site", "vr4java-test");
+        PropertiesUtil.setCategoryRedirection("vr4java-server", "vr4java-test");
         TestUtil.before("vr4java", "vr4java-test");
         serverMain.start();
     }
