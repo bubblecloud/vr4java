@@ -7,6 +7,7 @@ import org.vaadin.addons.sitekit.dao.CompanyDao;
 import org.vaadin.addons.sitekit.dao.UserDao;
 import org.vaadin.addons.sitekit.model.Company;
 import org.vaadin.addons.sitekit.model.User;
+import org.vaadin.addons.sitekit.util.PropertiesUtil;
 import org.vaadin.addons.sitekit.util.TestUtil;
 
 import javax.persistence.EntityManager;
@@ -31,7 +32,8 @@ public class SceneRepositoryTest {
 
     @Before
     public void before() throws Exception {
-        TestUtil.before("vr4java", "vr4java-server");
+        TestUtil.before("vr4java", "vr4java-test");
+
         final EntityManagerFactory entityManagerFactory = TestUtil.getEntityManagerFactory();
         final URI uri = new URL("http://127.0.0.1/rpc").toURI();
         entityManager = entityManagerFactory.createEntityManager();
@@ -45,7 +47,7 @@ public class SceneRepositoryTest {
 
     @After
     public void after() {
-        TestUtil.after("vr4java", "vr4java-server");
+        TestUtil.after("vr4java", "vr4java-test");
     }
 
     @Test
