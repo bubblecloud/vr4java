@@ -593,6 +593,16 @@ public class SceneNode {
         setZ((int) (translation.z * 1000));
     }
 
+    @JsonIgnore
+    public Vector3f getTranslation() {
+        return new Vector3f(
+            x / 1000f,
+            y/ 1000f,
+            z / 1000f
+        );
+    }
+
+
     public void setRotation(final Quaternion quaternion) {
         setAx((int) (quaternion.getX() * 10000));
         setAy((int) (quaternion.getY() * 10000));

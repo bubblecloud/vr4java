@@ -10,6 +10,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Spatial;
 import org.apache.log4j.Logger;
+import org.bubblecloud.vr4java.model.NodeType;
 
 /**
  * Created by tlaukkan on 9/24/2014.
@@ -47,8 +48,7 @@ public class SteeringController implements ActionListener, RawInputListener {
                 new KeyTrigger(KeyInput.KEY_S),
                 new KeyTrigger(KeyInput.KEY_DOWN));
         inputManager.addMapping("Jump",
-                new KeyTrigger(KeyInput.KEY_SPACE),
-                new KeyTrigger(KeyInput.KEY_RETURN));
+                new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addMapping("Shoot",
                 new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addListener(this, "Strafe Left", "Strafe Right");
@@ -141,6 +141,7 @@ public class SteeringController implements ActionListener, RawInputListener {
         } else if (binding.equals("Jump")) {
             characterControl.jump();
         }
+
     }
 
     public void onTalkBegin() {
@@ -216,6 +217,7 @@ public class SteeringController implements ActionListener, RawInputListener {
     }
 
     private boolean pressToTalkDown = false;
+    private final float GRID_STEP = 0.1f;
 
     @Override
     public void onKeyEvent(KeyInputEvent evt) {
@@ -230,6 +232,31 @@ public class SteeringController implements ActionListener, RawInputListener {
                 pressToTalkDown = false;
                 onTalkEnd();
             }
+        }
+
+        if (evt.getKeyCode() == KeyInput.KEY_ADD && evt.isReleased()) {
+            sceneContext.getSceneController().addEditNode(NodeType.CUBOID);
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_SUBTRACT && evt.isReleased()) {
+            sceneContext.getSceneController().removeEditNode();
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD8 && evt.isReleased()) {
+            sceneContext.getSceneController().translateEditNode(new Vector3f(-GRID_STEP, 0, 0));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD2 && evt.isReleased()) {
+            sceneContext.getSceneController().translateEditNode(new Vector3f(GRID_STEP, 0, 0));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD4 && evt.isReleased()) {
+            sceneContext.getSceneController().translateEditNode(new Vector3f(0, 0, GRID_STEP));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD6 && evt.isReleased()) {
+            sceneContext.getSceneController().translateEditNode(new Vector3f(0, 0, -GRID_STEP));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD1 && evt.isReleased()) {
+            sceneContext.getSceneController().translateEditNode(new Vector3f(0, -GRID_STEP, 0));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD3 && evt.isReleased()) {
+            sceneContext.getSceneController().translateEditNode(new Vector3f(0, GRID_STEP, 0));
         }
     }
 

@@ -178,15 +178,13 @@ public class SceneController implements SceneServiceListener {
 
     public void addNodes(List<SceneNode> nodes) {
         for (final SceneNode node : nodes) {
-            boolean local = false;
             for (SceneNode ownNode : dynamicNodes) {
                 if (ownNode.getId().equals(node.getId())) {
                     LOGGER.debug("Updated node index: " + node.getId() + ":" + node.getIndex());
                     ownNode.setIndex(node.getIndex());
-                    local = true;
                 }
             }
-            if (local) {
+            if (sceneContext.getCharacter().getSceneNode().getId().equals(node.getId())) {
                 continue;
             }
 
@@ -300,6 +298,12 @@ public class SceneController implements SceneServiceListener {
                         )
                 );
 
+                final RigidBodyControl rigidBodyControl = spatial.getControl(RigidBodyControl.class);
+                if (rigidBodyControl != null) {
+                    rigidBodyControl.setPhysicsLocation(spatial.getWorldTranslation());
+                    rigidBodyControl.setPhysicsRotation(spatial.getWorldRotation());
+                }
+
             }
 
         }
@@ -319,8 +323,8 @@ public class SceneController implements SceneServiceListener {
         spatial.setMaterial(material);
         updateSpatialTransformation(node, spatial);
 
-        final RigidBodyControl domeControl = new RigidBodyControl(0);
-        spatial.addControl(domeControl);
+        final RigidBodyControl rigidBodyControl = new RigidBodyControl(0);
+        spatial.addControl(rigidBodyControl);
         physicsSpace.add(spatial);
 
         return spatial;
@@ -440,6 +444,69 @@ public class SceneController implements SceneServiceListener {
         dynamicNodes = modifiedDynamicNodes;
         networkController.addNodes(scene, Collections.singletonList(sceneNode));
         networkController.setNodesDynamic(scene, Collections.singletonList(sceneNode.getId()));
+    }
+
+    public void removeDynamicNode(final SceneNode sceneNode) {
+        final List<SceneNode> modifiedDynamicNodes = Collections.synchronizedList(new ArrayList<>(dynamicNodes));
+        modifiedDynamicNodes.remove(sceneNode);
+        dynamicNodes = modifiedDynamicNodes;
+        networkController.removeNodes(scene, Collections.singletonList(sceneNode.getId()));
+    }
+
+    private SceneNode editedNode;
+
+    public void addEditNode(final NodeType nodeType) {
+        if (editedNode != null) {
+            LOGGER.warn("Already editing new node.");
+            return;
+        }
+        if (nodeType.equals(NodeType.CUBOID)) {
+            editedNode = new CuboidNode(1f, 1f, 1f, 1.0f,
+                    "jme3-open-asset-pack-v1/textures/rose_fisher_grassy_gradient.jpg");
+            editedNode.setScene(scene);
+            editedNode.setName(UUID.randomUUID().toString());
+            final Vector3f characterLocation = sceneContext.getCharacter().getSpatial().getWorldTranslation();
+            final Vector3f nodeLocation = characterLocation.add(
+                    sceneContext.getCharacter().getCharacterControl().getViewDirection().normalize().mult(2f));
+            editedNode.setTranslation(new org.bubblecloud.vecmath.Vector3f(
+                    nodeLocation.getX(),
+                    nodeLocation.getY(),
+                    nodeLocation.getZ()
+            ));
+            editedNode.setRotation(new org.bubblecloud.vecmath.Quaternion());
+            editedNode.setPersistent(false);
+            addDynamicNode(editedNode);
+        }
+    }
+
+    public void translateEditNode(final Vector3f translation) {
+        if (editedNode == null) {
+            LOGGER.warn("Not editing a node.");
+            return;
+        }
+        final org.bubblecloud.vecmath.Vector3f location = editedNode.getTranslation();
+        editedNode.setTranslation(location.add(new org.bubblecloud.vecmath.Vector3f(translation.x, translation.y, translation.z)));
+    }
+
+    public void rotateEditNode(final Quaternion rotation_) {
+        if (editedNode == null) {
+            LOGGER.warn("Not editing a node.");
+            return;
+        }
+        final org.bubblecloud.vecmath.Quaternion orientation = editedNode.getInterpolatedRotation();
+        final org.bubblecloud.vecmath.Quaternion rotation = new org.bubblecloud.vecmath.Quaternion(rotation_.getX(),
+                rotation_.getY(), rotation_.getZ(), rotation_.getW());
+        final org.bubblecloud.vecmath.Quaternion newOrientation = orientation.mult(rotation);
+        editedNode.setRotation(newOrientation);
+    }
+
+    public void removeEditNode() {
+        if (editedNode == null) {
+            LOGGER.warn("Not editing a node.");
+            return;
+        }
+        removeDynamicNode(editedNode);
+        editedNode = null;
     }
 
 }
