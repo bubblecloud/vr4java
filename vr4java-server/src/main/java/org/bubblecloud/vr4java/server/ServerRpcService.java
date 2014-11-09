@@ -225,6 +225,7 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
     @Override
     public void removeNodes(UUID sceneId, List<UUID> ids) {
         serverSceneService.removeNodes(sceneId, ids);
+        sceneRepository.removeNodes(sceneId, ids);
         for (final ServerRpcService service : services) {
             service.getClientService().removeNodes(sceneId, ids);
         }

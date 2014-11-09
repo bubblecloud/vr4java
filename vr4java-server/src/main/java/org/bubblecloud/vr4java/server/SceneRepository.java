@@ -154,6 +154,34 @@ public class SceneRepository {
         SceneNodeDao.updateSceneNodes(serverContext.getEntityManager(), nodesToUpdate);
     }
 
+    public void removeNodes(final UUID sceneId, final List<UUID> sceneNodeIds) {
+
+        final Scene scene = SceneDao.getScene(serverContext.getEntityManager(), sceneId);
+        if (scene == null) {
+            LOGGER.warn("Scene not found in repository: " + sceneId);
+        }
+
+        final List<SceneNode> sceneNodesToRemove = new ArrayList<SceneNode>();
+        for (final UUID sceneNodeId : sceneNodeIds) {
+            final SceneNode sceneNode = SceneNodeDao.getSceneNode(serverContext.getEntityManager(), sceneNodeId);
+            if (sceneNode == null) {
+                continue;
+            }
+            sceneNodesToRemove.add(sceneNode);
+        }
+
+        if (sceneNodesToRemove.size() > 0) {
+            if (serverContext.getUser() != null && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
+                    serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
+                    PRIVILEGE_ADMINISTRATE, sceneId.toString())
+                    && !serverContext.getRoles().contains("administrator")) {
+                throw new SecurityException("User " + serverContext.getUser().getUserId() + " node save denied to scene: " + sceneId);
+            }
+            SceneNodeDao.removeSceneNodes(serverContext.getEntityManager(), sceneNodesToRemove);
+        }
+    }
+
+
     public List<SceneNode> loadNodes(final Scene scene) {
         return SceneNodeDao.getSceneNodes(serverContext.getEntityManager(), scene);
     }

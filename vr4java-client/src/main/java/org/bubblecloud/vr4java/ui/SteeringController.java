@@ -1,12 +1,16 @@
 package org.bubblecloud.vr4java.ui;
 
 import com.jme3.bullet.control.BetterCharacterControl;
+import com.jme3.collision.CollisionResult;
+import com.jme3.collision.CollisionResults;
 import com.jme3.input.*;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.input.event.*;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Spatial;
@@ -47,11 +51,10 @@ public class SteeringController implements ActionListener, RawInputListener {
                 new KeyTrigger(KeyInput.KEY_S));
         inputManager.addMapping("Jump",
                 new KeyTrigger(KeyInput.KEY_SPACE));
-        inputManager.addMapping("Shoot",
-                new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+
         inputManager.addListener(this, "Strafe Left", "Strafe Right");
         inputManager.addListener(this, "Walk Forward", "Walk Backward");
-        inputManager.addListener(this, "Jump", "Shoot");
+        inputManager.addListener(this, "Jump");
 
     }
 
@@ -211,7 +214,29 @@ public class SteeringController implements ActionListener, RawInputListener {
 
     @Override
     public void onMouseButtonEvent(MouseButtonEvent evt) {
+        if (evt.getButtonIndex() == MouseInput.BUTTON_LEFT && evt.isReleased()) {
+            final CollisionResults results = new CollisionResults();
+            final Vector2f click2d = inputManager.getCursorPosition();
+            final Vector3f click3d = sceneContext.getCamera().getWorldCoordinates(
+                    new Vector2f(click2d.x, click2d.y), 0f).clone();
+            final Vector3f dir = sceneContext.getCamera().getWorldCoordinates(
+                    new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+            final Ray ray = new Ray(click3d, dir);
+            sceneContext.getRootNode().collideWith(ray, results);
 
+            if (results.size() > 0){
+                // The closest collision point is what was truly hit:
+                final CollisionResult closest = results.getClosestCollision();
+                final float distance = closest.getDistance();
+                final Vector3f location = closest.getContactPoint();
+                final String name = closest.getGeometry().getName();
+                LOGGER.info("Picked " + name + " at " + location + " and " + distance + " meters away.");
+
+                final Spatial spatial = closest.getGeometry();
+                sceneContext.getSceneController().selectEditNode(spatial);
+            }
+
+        }
     }
 
     private boolean pressToTalkDown = false;

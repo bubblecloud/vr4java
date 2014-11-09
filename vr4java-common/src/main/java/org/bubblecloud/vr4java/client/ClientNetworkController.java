@@ -166,11 +166,19 @@ public class ClientNetworkController {
         serverSceneService.setNodesDynamic(scene.getId(), nodeIdList);
     }
 
+    public void setNodesStatic(Scene scene, List<UUID> nodeIdList) {
+        serverSceneService.setNodesStatic(scene.getId(), nodeIdList);
+    }
+
     public void addNodes(Scene scene, List<SceneNode> nodeList) {
         for (final SceneNode node : nodeList) {
             node.setOwnerCertificateFingerprint(getFingerprint());
         }
         serverSceneService.addNodes(scene.getId(), nodeList);
+    }
+
+    public void updateNodes(Scene scene, List<SceneNode> nodeList) {
+        serverSceneService.updateNodes(scene.getId(), nodeList);
     }
 
     public void removeNodes(Scene scene, List<UUID> nodeIds) {

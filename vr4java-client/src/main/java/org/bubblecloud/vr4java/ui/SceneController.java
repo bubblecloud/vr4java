@@ -23,6 +23,7 @@ import org.bubblecloud.vr4java.client.ClientNetworkController;
 import org.bubblecloud.vr4java.client.ClientRpcService;
 import org.bubblecloud.vr4java.model.*;
 import org.bubblecloud.vr4java.util.VrConstants;
+import org.eclipse.persistence.internal.jaxb.many.MapEntry;
 import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import java.util.*;
@@ -442,7 +443,12 @@ public class SceneController implements SceneServiceListener {
         sceneNode.setPersistent(false);
         sceneNode.setName(name);
         updateNodeTransformation(characterNode, sceneNode);
+
         addDynamicNode(sceneNode);
+
+        sceneNode.setId(networkController.calculateGlobalId(sceneNode.getName()));
+        networkController.addNodes(scene, Collections.singletonList(sceneNode));
+        networkController.setNodesDynamic(scene, Collections.singletonList(sceneNode.getId()));
 
         characterAnimator = new CharacterAnimator(sceneNode, model, steeringController);
 
@@ -450,19 +456,15 @@ public class SceneController implements SceneServiceListener {
     }
 
     public void addDynamicNode(final SceneNode sceneNode) {
-        sceneNode.setId(networkController.calculateGlobalId(sceneNode.getName()));
         final List<SceneNode> modifiedDynamicNodes = Collections.synchronizedList(new ArrayList<>(dynamicNodes));
         modifiedDynamicNodes.add(sceneNode);
         dynamicNodes = modifiedDynamicNodes;
-        networkController.addNodes(scene, Collections.singletonList(sceneNode));
-        networkController.setNodesDynamic(scene, Collections.singletonList(sceneNode.getId()));
     }
 
     public void removeDynamicNode(final SceneNode sceneNode) {
         final List<SceneNode> modifiedDynamicNodes = Collections.synchronizedList(new ArrayList<>(dynamicNodes));
         modifiedDynamicNodes.remove(sceneNode);
         dynamicNodes = modifiedDynamicNodes;
-        networkController.removeNodes(scene, Collections.singletonList(sceneNode.getId()));
     }
 
     private SceneNode editedNode;
@@ -487,7 +489,12 @@ public class SceneController implements SceneServiceListener {
             ));
             editedNode.setRotation(new org.bubblecloud.vecmath.Quaternion());
             editedNode.setPersistent(false);
+
             addDynamicNode(editedNode);
+
+            editedNode.setId(networkController.calculateGlobalId(editedNode.getName()));
+            networkController.addNodes(scene, Collections.singletonList(editedNode));
+            networkController.setNodesDynamic(scene, Collections.singletonList(editedNode.getId()));
         }
     }
 
@@ -526,6 +533,8 @@ public class SceneController implements SceneServiceListener {
             return;
         }
         removeDynamicNode(editedNode);
+        networkController.setNodesStatic(scene, Arrays.asList(editedNode.getId()));
+        networkController.removeNodes(scene, Collections.singletonList(editedNode.getId()));
         editedNode = null;
     }
 
@@ -534,12 +543,31 @@ public class SceneController implements SceneServiceListener {
             LOGGER.warn("Not editing a node.");
             return;
         }
-
         removeDynamicNode(editedNode);
-        editedNode.setPersistent(true);
-        networkController.addNodes(scene, Arrays.asList(editedNode));
+        networkController.setNodesStatic(scene, Arrays.asList(editedNode.getId()));
 
+        editedNode.setPersistent(true);
+        networkController.updateNodes(scene, Arrays.asList(editedNode));
         editedNode = null;
     }
 
+    public void selectEditNode(final Spatial spatial) {
+        if (editedNode != null) {
+            saveEditNode();
+        }
+
+        for (final Map.Entry<UUID, Spatial> spatialMapEntry : spatials.entrySet()) {
+            if (spatialMapEntry.getValue().equals(spatial)) {
+                final UUID nodeId = spatialMapEntry.getKey();
+                final List<SceneNode> nodes = clientRpcService.getNodes(scene.getId(), Arrays.asList(nodeId));
+                if (nodes.size() == 1) {
+
+                    editedNode = nodes.get(0);
+                    addDynamicNode(editedNode);
+                    networkController.setNodesDynamic(scene, Arrays.asList(editedNode.getId()));
+
+                }
+            }
+        }
+    }
 }
