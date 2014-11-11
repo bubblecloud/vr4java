@@ -6,6 +6,7 @@ import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
+import com.jme3.material.MatParam;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -26,7 +27,9 @@ import org.bubblecloud.vr4java.util.VrConstants;
 import org.eclipse.persistence.internal.jaxb.many.MapEntry;
 import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by tlaukkan on 9/26/2014.
@@ -330,12 +333,14 @@ public class SceneController implements SceneServiceListener {
 
                 if (spatial instanceof  Geometry) {
                     final Material material = ((Geometry) spatial).getMaterial();
-                    final boolean wireframe = material.getAdditionalRenderState().isWireframe();
+                    final MatParam ambientColorParam = material.getParam("Ambient");
+                    final ColorRGBA ambientColor = (ColorRGBA) ambientColorParam.getValue();
+                    final boolean highlighted = ambientColor.equals(ColorRGBA.White);
                     final boolean edited = editedNode != null && sceneNode.getId().equals(editedNode.getId());
-                    if (edited && !wireframe) {
-                        material.getAdditionalRenderState().setWireframe(true);
-                    } else if (!edited && wireframe) {
-                        material.getAdditionalRenderState().setWireframe(false);
+                    if (edited && !highlighted) {
+                        material.setColor("Ambient", ColorRGBA.White);
+                    } else if (!edited && highlighted) {
+                        material.setColor("Ambient", ColorRGBA.LightGray);
                     }
                 }
 
