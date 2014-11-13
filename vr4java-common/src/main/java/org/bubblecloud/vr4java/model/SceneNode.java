@@ -507,6 +507,7 @@ public class SceneNode {
     }
 
     public void update(final SceneNode source) {
+        setOwnerCertificateFingerprint(source.getOwnerCertificateFingerprint());
         setName(source.getName());
         setState(source.getState());
         setX(source.getX());

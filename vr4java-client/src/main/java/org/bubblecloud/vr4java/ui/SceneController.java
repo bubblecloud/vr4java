@@ -140,7 +140,7 @@ public class SceneController implements SceneServiceListener {
 
     @Override
     public void onUpdateNodes(UUID sceneId, List<UUID> nodeIds) {
-        LOGGER.debug("Scene " + sceneId + " on nodes updated: " + nodeIds);
+        LOGGER.info("Scene " + sceneId + " on nodes updated: " + nodeIds);
 
         synchronized (updatedNodes) {
             if (sceneId.equals(scene.getId())) {
@@ -262,13 +262,19 @@ public class SceneController implements SceneServiceListener {
     }
 
     public void updateNodes(List<SceneNode> nodes) {
+        final HashSet<UUID> nodeIds = new HashSet<UUID>();
         for (final SceneNode node : nodes) {
+            nodeIds.add(node.getId());
+        }
+        removeNodes(nodeIds);
+        addNodes(nodes);
+        /*for (final SceneNode node : nodes) {
             final Spatial spatial = spatials.get(node.getId());
             if (spatial == null) {
                 continue;
             }
             updateSpatialTransformation(node, spatial);
-        }
+        }*/
     }
 
     public void removeNodes(HashSet<UUID> nodeIds) {
@@ -280,6 +286,7 @@ public class SceneController implements SceneServiceListener {
             if (animationControllers.containsKey(nodeId)) {
                 animationControllers.remove(nodeId);
             }
+            physicsSpace.remove(spatial);
             spatials.remove(nodeId);
         }
     }

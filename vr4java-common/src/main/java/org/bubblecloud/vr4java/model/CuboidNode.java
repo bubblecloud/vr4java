@@ -44,6 +44,16 @@ public class CuboidNode extends SceneNode {
         return node;
     }
 
+    @Override
+    public void update(SceneNode source) {
+        super.update(source);
+        setDimensionX(((CuboidNode) source).getDimensionX());
+        setDimensionY(((CuboidNode) source).getDimensionY());
+        setDimensionZ(((CuboidNode) source).getDimensionZ());
+        setShininess(((CuboidNode) source).getShininess());
+        setTexture(((CuboidNode) source).getTexture());
+    }
+
     public float getShininess() {
         return shininess;
     }

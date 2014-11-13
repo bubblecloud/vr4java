@@ -15,9 +15,14 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Spatial;
 import org.apache.log4j.Logger;
+import org.bubblecloud.vr4java.client.ClientRpcService;
+import org.bubblecloud.vr4java.model.CuboidNode;
 import org.bubblecloud.vr4java.model.NodeType;
+import org.bubblecloud.vr4java.model.Scene;
 import org.bubblecloud.vr4java.model.SceneNode;
 import org.bubblecloud.vr4java.util.VrConstants;
+
+import java.util.Arrays;
 
 /**
  * Created by tlaukkan on 9/24/2014.
@@ -323,34 +328,13 @@ public class SteeringController implements ActionListener, RawInputListener {
             }
         }
 
-        if (evt.getKeyCode() == KeyInput.KEY_ADD && evt.isReleased()) {
+        if (evt.getKeyCode() == KeyInput.KEY_INSERT && evt.isReleased()) {
             sceneContext.getEditController().addEditNode(NodeType.CUBOID);
         }
-        if (evt.getKeyCode() == KeyInput.KEY_SUBTRACT && evt.isReleased()) {
+        if (evt.getKeyCode() == KeyInput.KEY_DELETE && evt.isReleased()) {
             sceneContext.getEditController().removeEditNode();
         }
-        if (evt.getKeyCode() == KeyInput.KEY_RETURN && evt.isReleased()) {
-            sceneContext.getEditController().saveEditNode();
-        }
 
-        /*if (evt.getKeyCode() == KeyInput.KEY_NUMPAD8 && evt.isReleased()) {
-            sceneContext.getEditController().translateEditNode(new Vector3f(-VrConstants.GRID_STEP_TRANSLATION, 0, 0));
-        }
-        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD2 && evt.isReleased()) {
-            sceneContext.getEditController().translateEditNode(new Vector3f(VrConstants.GRID_STEP_TRANSLATION, 0, 0));
-        }
-        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD4 && evt.isReleased()) {
-            sceneContext.getEditController().translateEditNode(new Vector3f(0, 0, VrConstants.GRID_STEP_TRANSLATION));
-        }
-        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD6 && evt.isReleased()) {
-            sceneContext.getEditController().translateEditNode(new Vector3f(0, 0, -VrConstants.GRID_STEP_TRANSLATION));
-        }
-        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD1 && evt.isReleased()) {
-            sceneContext.getEditController().translateEditNode(new Vector3f(0, -VrConstants.GRID_STEP_TRANSLATION, 0));
-        }
-        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD3 && evt.isReleased()) {
-            sceneContext.getEditController().translateEditNode(new Vector3f(0, VrConstants.GRID_STEP_TRANSLATION, 0));
-        }*/
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD4 && evt.isReleased()) {
             sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
         }
@@ -397,6 +381,53 @@ public class SteeringController implements ActionListener, RawInputListener {
         if (evt.getKeyCode() == KeyInput.KEY_RIGHT && evt.isReleased()) {
             final Vector3f delta = sceneContext.getCamera().getLeft().mult(-VrConstants.GRID_STEP_TRANSLATION);
             translateAndSnapEditNode(delta);
+        }
+
+        if (evt.getKeyCode() == KeyInput.KEY_ADD && evt.isReleased()) {
+            final SceneNode node = sceneContext.getEditController().getEditedNode();
+            if (node == null || !(node instanceof CuboidNode)) {
+                return;
+            }
+            final CuboidNode cuboid = (CuboidNode) node;
+            cuboid.setDimensionX(cuboid.getDimensionX() + VrConstants.GRID_STEP_TRANSLATION);
+            cuboid.setDimensionY(cuboid.getDimensionY() + VrConstants.GRID_STEP_TRANSLATION);
+            cuboid.setDimensionZ(cuboid.getDimensionZ() + VrConstants.GRID_STEP_TRANSLATION);
+            sceneContext.getClientNetwork().updateNodes(sceneContext.getSceneController().getScene(),
+                    Arrays.asList((SceneNode) cuboid));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_SUBTRACT && evt.isReleased()) {
+            final SceneNode node = sceneContext.getEditController().getEditedNode();
+            if (node == null || !(node instanceof CuboidNode)) {
+                return;
+            }
+            final CuboidNode cuboid = (CuboidNode) node;
+            cuboid.setDimensionX(cuboid.getDimensionX() - VrConstants.GRID_STEP_TRANSLATION);
+            cuboid.setDimensionY(cuboid.getDimensionY() - VrConstants.GRID_STEP_TRANSLATION);
+            cuboid.setDimensionZ(cuboid.getDimensionZ() - VrConstants.GRID_STEP_TRANSLATION);
+            sceneContext.getClientNetwork().updateNodes(sceneContext.getSceneController().getScene(),
+                    Arrays.asList((SceneNode) cuboid));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_MULTIPLY && evt.isReleased()) {
+            final SceneNode node = sceneContext.getEditController().getEditedNode();
+            if (node == null || !(node instanceof CuboidNode)) {
+                return;
+            }
+            final CuboidNode cuboid = (CuboidNode) node;
+            cuboid.setDimensionX(cuboid.getDimensionX() + VrConstants.GRID_STEP_TRANSLATION);
+            cuboid.setDimensionZ(cuboid.getDimensionZ() + VrConstants.GRID_STEP_TRANSLATION);
+            sceneContext.getClientNetwork().updateNodes(sceneContext.getSceneController().getScene(),
+                    Arrays.asList((SceneNode) cuboid));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_DIVIDE && evt.isReleased()) {
+            final SceneNode node = sceneContext.getEditController().getEditedNode();
+            if (node == null || !(node instanceof CuboidNode)) {
+                return;
+            }
+            final CuboidNode cuboid = (CuboidNode) node;
+            cuboid.setDimensionX(cuboid.getDimensionX() - VrConstants.GRID_STEP_TRANSLATION);
+            cuboid.setDimensionZ(cuboid.getDimensionZ() - VrConstants.GRID_STEP_TRANSLATION);
+            sceneContext.getClientNetwork().updateNodes(sceneContext.getSceneController().getScene(),
+                    Arrays.asList((SceneNode) cuboid));
         }
     }
 

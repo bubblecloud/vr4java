@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.bubblecloud.vr4java.api.SceneService;
 import org.bubblecloud.vr4java.api.SceneServiceImpl;
 import org.bubblecloud.vr4java.api.SceneServiceListener;
+import org.bubblecloud.vr4java.model.CuboidNode;
 import org.bubblecloud.vr4java.model.SceneNode;
 import org.bubblecloud.vr4java.model.Scene;
 import org.bubblecloud.vr4java.rpc.MessageHandler;

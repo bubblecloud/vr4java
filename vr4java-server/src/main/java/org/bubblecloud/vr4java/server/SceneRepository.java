@@ -132,9 +132,14 @@ public class SceneRepository {
         final List<SceneNode> nodesToUpdate = new ArrayList<SceneNode>();
         for (final SceneNode sceneNode : sceneNodes) {
             if (serverContext.getUser() != null) {
-                if (!serverContext.getUserCertificateFingerprint().equals(sceneNode.getOwnerCertificateFingerprint())) {
+                if (!serverContext.getUserCertificateFingerprint().equals(sceneNode.getOwnerCertificateFingerprint()
+                    ) && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
+                        serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
+                        PRIVILEGE_ADMINISTRATE, sceneId.toString())
+                        && !serverContext.getRoles().contains("administrator")) {
                     throw new SecurityException("User: " + serverContext.getUser()
-                            + " tried to save not owned object: " + sceneNode.getId());
+                            + " tried to save not owned object and was not administrator nor" +
+                            " had administrator privileges on the scene: " + sceneNode.getId());
                 }
             }
 
