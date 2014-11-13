@@ -169,6 +169,11 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
     }
 
     @Override
+    public SceneNode getNode(UUID sceneId, UUID id) {
+        return serverSceneService.getNode(sceneId, id);
+    }
+
+    @Override
     public List<SceneNode> getNodes(UUID sceneId, List<UUID> ids) {
         return serverSceneService.getNodes(sceneId, ids);
     }

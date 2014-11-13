@@ -16,6 +16,7 @@ import com.jme3.renderer.Camera;
 import com.jme3.scene.Spatial;
 import org.apache.log4j.Logger;
 import org.bubblecloud.vr4java.model.NodeType;
+import org.bubblecloud.vr4java.model.SceneNode;
 import org.bubblecloud.vr4java.util.VrConstants;
 
 /**
@@ -65,10 +66,10 @@ public class SteeringController implements ActionListener, RawInputListener {
     public void setCharacter(final Character character) {
         this.character = character;
         this.characterSpatial = character.getSpatial();
-
         this.characterControl = character.getCharacterControl();
 
         ChaseCamera chaseCam = new ChaseCamera(camera, characterSpatial, inputManager);
+        chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setDefaultDistance(10f);
         chaseCam.setLookAtOffset(Vector3f.UNIT_Y.mult(2));
@@ -207,39 +208,105 @@ public class SteeringController implements ActionListener, RawInputListener {
 
     }
 
+    private Vector3f dragLastDir;
+    private float dragLastObjectDistance;
+    private Vector3f dragLastCoordinate;
+
     @Override
     public void onMouseMotionEvent(MouseMotionEvent evt) {
+        if (mouseDragDown) {
+            final int z = evt.getDeltaWheel();
 
+            final Vector2f drag2d = inputManager.getCursorPosition();
+            final Vector3f drag3d = sceneContext.getCamera().getWorldCoordinates(
+                    new Vector2f(drag2d.x, drag2d.y), 0f).clone();
+            final Vector3f dir = sceneContext.getCamera().getWorldCoordinates(
+                    new Vector2f(drag2d.x, drag2d.y), 1f).subtractLocal(drag3d).normalizeLocal();
+
+            final float objectDistance = dragLastObjectDistance;// + z / 1000f;
+
+            final Vector3f coordinate = drag3d.add(dir.mult(objectDistance));
+
+            final Vector3f dragDelta3d = coordinate.subtract(dragLastCoordinate);
+            sceneContext.getEditController().translateEditNode(dragDelta3d);
+
+            dragLastDir = dir;
+            dragLastCoordinate = coordinate;
+            dragLastObjectDistance = objectDistance;
+        }
     }
+
+    private void snapToGrid(org.bubblecloud.vecmath.Vector3f coordinate) {
+        coordinate.x += Math.signum(coordinate.x) * VrConstants.GRID_STEP_TRANSLATION / 2;
+        coordinate.y += Math.signum(coordinate.y) * VrConstants.GRID_STEP_TRANSLATION / 2;
+        coordinate.z += Math.signum(coordinate.z) * VrConstants.GRID_STEP_TRANSLATION / 2;
+        coordinate.x = coordinate.x - (coordinate.x) % VrConstants.GRID_STEP_TRANSLATION;
+        coordinate.y = coordinate.y - (coordinate.y) % VrConstants.GRID_STEP_TRANSLATION;
+        coordinate.z = coordinate.z - (coordinate.z) % VrConstants.GRID_STEP_TRANSLATION;
+    }
+
+    private long dragLastStartTimeMillis;
+    private boolean lastClickWasSelect = false;
 
     @Override
     public void onMouseButtonEvent(MouseButtonEvent evt) {
-        if (evt.getButtonIndex() == MouseInput.BUTTON_LEFT && evt.isReleased()) {
-            final CollisionResults results = new CollisionResults();
-            final Vector2f click2d = inputManager.getCursorPosition();
-            final Vector3f click3d = sceneContext.getCamera().getWorldCoordinates(
-                    new Vector2f(click2d.x, click2d.y), 0f).clone();
-            final Vector3f dir = sceneContext.getCamera().getWorldCoordinates(
-                    new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
-            final Ray ray = new Ray(click3d, dir);
-            sceneContext.getRootNode().collideWith(ray, results);
+        if (evt.getButtonIndex() == MouseInput.BUTTON_LEFT && evt.isPressed()) {
+            if (!mouseDragDown) {
+                final CollisionResults results = new CollisionResults();
+                final Vector2f click2d = inputManager.getCursorPosition();
+                final Vector3f click3d = sceneContext.getCamera().getWorldCoordinates(
+                        new Vector2f(click2d.x, click2d.y), 0f).clone();
+                final Vector3f dir = sceneContext.getCamera().getWorldCoordinates(
+                        new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+                final Ray ray = new Ray(click3d, dir);
+                sceneContext.getRootNode().collideWith(ray, results);
 
-            if (results.size() > 0){
-                // The closest collision point is what was truly hit:
-                final CollisionResult closest = results.getClosestCollision();
-                final float distance = closest.getDistance();
-                final Vector3f location = closest.getContactPoint();
-                final String name = closest.getGeometry().getName();
-                LOGGER.info("Picked " + name + " at " + location + " and " + distance + " meters away.");
+                if (results.size() > 0){
+                    // The closest collision point is what was truly hit:
+                    final CollisionResult closest = results.getClosestCollision();
+                    final float distance = closest.getDistance();
+                    final Vector3f location = closest.getContactPoint();
+                    final String name = closest.getGeometry().getName();
+                    LOGGER.info("Picked " + name + " at " + location + " and " + distance + " meters away.");
 
-                final Spatial spatial = closest.getGeometry();
-                sceneContext.getSceneController().selectEditNode(spatial);
+                    final Spatial spatial = closest.getGeometry();
+
+                    final SceneNode lastSceneNode = sceneContext.getEditController().getEditedNode();
+                    if (sceneContext.getEditController().selectEditNode(spatial)) {
+                        mouseDragDown = true;
+                        dragLastDir = dir;
+                        dragLastObjectDistance = distance;
+                        dragLastCoordinate = location;
+                        dragLastStartTimeMillis = System.currentTimeMillis();
+                        lastClickWasSelect = !sceneContext.getEditController().getEditedNode().equals(
+                                lastSceneNode);
+                    } else {
+                        lastClickWasSelect = false;
+                    }
+                }
             }
-
+        }
+        if (evt.getButtonIndex() == MouseInput.BUTTON_LEFT && evt.isReleased()) {
+            if (mouseDragDown) {
+                mouseDragDown = false;
+                if (sceneContext.getEditController().getEditedNode() != null) {
+                    if (System.currentTimeMillis() - dragLastStartTimeMillis < 300) {
+                        if (!lastClickWasSelect) {
+                            sceneContext.getEditController().saveEditNode();
+                        }
+                    } else {
+                        final org.bubblecloud.vecmath.Vector3f translation =
+                                sceneContext.getEditController().getEditedNode().getTranslation();
+                        snapToGrid(translation);
+                        sceneContext.getEditController().getEditedNode().setTranslation(translation);
+                    }
+                }
+            }
         }
     }
 
     private boolean pressToTalkDown = false;
+    private boolean mouseDragDown = false;
 
     @Override
     public void onKeyEvent(KeyInputEvent evt) {
@@ -257,54 +324,95 @@ public class SteeringController implements ActionListener, RawInputListener {
         }
 
         if (evt.getKeyCode() == KeyInput.KEY_ADD && evt.isReleased()) {
-            sceneContext.getSceneController().addEditNode(NodeType.CUBOID);
+            sceneContext.getEditController().addEditNode(NodeType.CUBOID);
         }
         if (evt.getKeyCode() == KeyInput.KEY_SUBTRACT && evt.isReleased()) {
-            sceneContext.getSceneController().removeEditNode();
+            sceneContext.getEditController().removeEditNode();
         }
         if (evt.getKeyCode() == KeyInput.KEY_RETURN && evt.isReleased()) {
-            sceneContext.getSceneController().saveEditNode();
+            sceneContext.getEditController().saveEditNode();
         }
 
-        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD8 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(-VrConstants.GRID_STEP_TRANSLATION, 0, 0));
+        /*if (evt.getKeyCode() == KeyInput.KEY_NUMPAD8 && evt.isReleased()) {
+            sceneContext.getEditController().translateEditNode(new Vector3f(-VrConstants.GRID_STEP_TRANSLATION, 0, 0));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD2 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(VrConstants.GRID_STEP_TRANSLATION, 0, 0));
+            sceneContext.getEditController().translateEditNode(new Vector3f(VrConstants.GRID_STEP_TRANSLATION, 0, 0));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD4 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(0, 0, VrConstants.GRID_STEP_TRANSLATION));
+            sceneContext.getEditController().translateEditNode(new Vector3f(0, 0, VrConstants.GRID_STEP_TRANSLATION));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD6 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(0, 0, -VrConstants.GRID_STEP_TRANSLATION));
+            sceneContext.getEditController().translateEditNode(new Vector3f(0, 0, -VrConstants.GRID_STEP_TRANSLATION));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD1 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(0, -VrConstants.GRID_STEP_TRANSLATION, 0));
+            sceneContext.getEditController().translateEditNode(new Vector3f(0, -VrConstants.GRID_STEP_TRANSLATION, 0));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD3 && evt.isReleased()) {
-            sceneContext.getSceneController().translateEditNode(new Vector3f(0, VrConstants.GRID_STEP_TRANSLATION, 0));
+            sceneContext.getEditController().translateEditNode(new Vector3f(0, VrConstants.GRID_STEP_TRANSLATION, 0));
+        }*/
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD4 && evt.isReleased()) {
+            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
         }
-        if (evt.getKeyCode() == KeyInput.KEY_LEFT && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD6 && evt.isReleased()) {
+            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
         }
-        if (evt.getKeyCode() == KeyInput.KEY_RIGHT && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD8 && evt.isReleased()) {
+            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 0, 1f)));
         }
-        if (evt.getKeyCode() == KeyInput.KEY_UP && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 0, 1f)));
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD2 && evt.isReleased()) {
+            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 0, 1f)));
         }
-        if (evt.getKeyCode() == KeyInput.KEY_DOWN && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 0, 1f)));
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD3 && evt.isReleased()) {
+            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(1f, 0, 0)));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD1 && evt.isReleased()) {
+            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(1f, 0, 0)));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD5 && evt.isReleased()) {
+            sceneContext.getEditController().resetEditNodeRotation();
+        }
+
+        if (evt.getKeyCode() == KeyInput.KEY_PGUP && evt.isReleased()) {
+            final Vector3f delta = sceneContext.getCamera().getUp().mult(VrConstants.GRID_STEP_TRANSLATION);
+            translateAndSnapEditNode(delta);
         }
         if (evt.getKeyCode() == KeyInput.KEY_PGDN && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(1f, 0, 0)));
+            final Vector3f delta = sceneContext.getCamera().getUp().mult(-VrConstants.GRID_STEP_TRANSLATION);
+            translateAndSnapEditNode(delta);
         }
-        if (evt.getKeyCode() == KeyInput.KEY_END && evt.isReleased()) {
-            sceneContext.getSceneController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(1f, 0, 0)));
+
+        if (evt.getKeyCode() == KeyInput.KEY_UP && evt.isReleased()) {
+            final Vector3f delta = sceneContext.getCamera().getDirection().mult(VrConstants.GRID_STEP_TRANSLATION);
+            translateAndSnapEditNode(delta);
         }
-        if (evt.getKeyCode() == KeyInput.KEY_HOME && evt.isReleased()) {
-            sceneContext.getSceneController().resetEditNodeRotation();
+        if (evt.getKeyCode() == KeyInput.KEY_DOWN && evt.isReleased()) {
+            final Vector3f delta = sceneContext.getCamera().getDirection().mult(-VrConstants.GRID_STEP_TRANSLATION);
+            translateAndSnapEditNode(delta);
         }
+        if (evt.getKeyCode() == KeyInput.KEY_LEFT && evt.isReleased()) {
+            final Vector3f delta = sceneContext.getCamera().getLeft().mult(VrConstants.GRID_STEP_TRANSLATION);
+            translateAndSnapEditNode(delta);
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_RIGHT && evt.isReleased()) {
+            final Vector3f delta = sceneContext.getCamera().getLeft().mult(-VrConstants.GRID_STEP_TRANSLATION);
+            translateAndSnapEditNode(delta);
+        }
+    }
+
+    private void translateAndSnapEditNode(Vector3f delta) {
+        final SceneNode node = sceneContext.getEditController().getEditedNode();
+        if (node == null) {
+            return;
+        }
+        final org.bubblecloud.vecmath.Vector3f translation = new org.bubblecloud.vecmath.Vector3f(
+                delta.x,
+                delta.y,
+                delta.z
+        );
+        final org.bubblecloud.vecmath.Vector3f location = node.getTranslation().add(translation);
+        snapToGrid(location);
+        node.setTranslation(location);
     }
 
     @Override

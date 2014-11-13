@@ -32,7 +32,7 @@ public class AudioRecordController {
                     if (off != 0) {
                         throw new RuntimeException("Offset is assumed to be zero but was: " + off);
                     }
-                    sceneContext.getClientNetworkController().playNodeAudio(
+                    sceneContext.getClientNetwork().playNodeAudio(
                             sceneContext.getCharacter().getSceneNode().getScene().getId(),
                             sceneContext.getCharacter().getSceneNode().getId(),
                             Arrays.copyOf(b, len)
@@ -56,7 +56,7 @@ public class AudioRecordController {
         audioRecorder = null;
         LOGGER.info("Audio recording stopped.");
         // Signaling end of stream.
-        sceneContext.getClientNetworkController().playNodeAudio(
+        sceneContext.getClientNetwork().playNodeAudio(
                 sceneContext.getCharacter().getSceneNode().getScene().getId(),
                 sceneContext.getCharacter().getSceneNode().getId(),
                 new byte[0]);

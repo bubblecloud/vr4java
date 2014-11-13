@@ -41,6 +41,9 @@ public interface SceneService {
     public Collection<SceneNode> getNodes(final UUID sceneId);
 
     @RpcMethod
+    public SceneNode getNode(final UUID sceneId, final UUID ids);
+
+    @RpcMethod
     public List<SceneNode> getNodes(final UUID sceneId, final List<UUID> ids);
 
     @RpcEvent

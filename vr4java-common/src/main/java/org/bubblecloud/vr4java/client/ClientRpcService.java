@@ -21,6 +21,10 @@ public class ClientRpcService implements SceneService, MessageHandler {
 
     private SceneService sceneService = new SceneServiceImpl();
 
+    public SceneService getSceneService() {
+        return sceneService;
+    }
+
     @Override
     public UUID addScene(String name, long x, long y, long z) {
         return sceneService.addScene(name, x, y, z);
@@ -29,6 +33,11 @@ public class ClientRpcService implements SceneService, MessageHandler {
     @Override
     public Collection<SceneNode> getNodes(UUID sceneId) {
         return sceneService.getNodes(sceneId);
+    }
+
+    @Override
+    public SceneNode getNode(UUID sceneId, UUID id) {
+        return sceneService.getNode(sceneId, id);
     }
 
     @Override

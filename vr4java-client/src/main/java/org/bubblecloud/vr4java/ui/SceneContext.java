@@ -5,7 +5,7 @@ import com.jme3.bullet.PhysicsSpace;
 import com.jme3.input.InputManager;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
-import org.bubblecloud.vr4java.client.ClientNetworkController;
+import org.bubblecloud.vr4java.client.ClientNetwork;
 
 /**
  * Created by tlaukkan on 9/27/2014.
@@ -18,9 +18,11 @@ public class SceneContext {
     private PhysicsSpace physicsSpace;
     private Node rootNode;
 
-    private ClientNetworkController clientNetworkController;
+    private ClientNetwork clientNetwork;
     private SteeringController steeringController;
     private SceneController sceneController;
+    private EditController editController;
+
     private AudioRecordController audioRecordController;
     private AudioPlaybackController audioPlaybackController;
 
@@ -50,12 +52,12 @@ public class SceneContext {
         this.physicsSpace = physicsSpace;
     }
 
-    public ClientNetworkController getClientNetworkController() {
-        return clientNetworkController;
+    public ClientNetwork getClientNetwork() {
+        return clientNetwork;
     }
 
-    public void setClientNetworkController(ClientNetworkController clientNetworkController) {
-        this.clientNetworkController = clientNetworkController;
+    public void setClientNetwork(ClientNetwork clientNetwork) {
+        this.clientNetwork = clientNetwork;
     }
 
     public SteeringController getSteeringController() {
@@ -72,6 +74,14 @@ public class SceneContext {
 
     public void setSceneController(SceneController sceneController) {
         this.sceneController = sceneController;
+    }
+
+    public EditController getEditController() {
+        return editController;
+    }
+
+    public void setEditController(EditController editController) {
+        this.editController = editController;
     }
 
     public Character getCharacter() {

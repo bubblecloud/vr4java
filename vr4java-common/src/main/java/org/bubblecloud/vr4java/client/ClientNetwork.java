@@ -26,8 +26,8 @@ import java.util.*;
 /**
  * Created by tlaukkan on 9/21/14.
  */
-public class ClientNetworkController {
-    private static final Logger LOGGER = Logger.getLogger(ClientNetworkController.class.getName());
+public class ClientNetwork {
+    private static final Logger LOGGER = Logger.getLogger(ClientNetwork.class.getName());
 
     private String rpcUrl =
             (PropertiesUtil.getProperty("vr4java-client", "server-tsl").equals("true") ? "wss://" : "ws://") +
@@ -48,7 +48,7 @@ public class ClientNetworkController {
 
     private Map<UUID, Scene> scenes = new HashMap<>();
 
-    public ClientNetworkController() {
+    public ClientNetwork() {
         final URI uri = URI.create(rpcUrl);
         clientService = new ClientRpcService();
         client = new RpcWsClient( PropertiesUtil.getProperty("vr4java-client", "user-name"), uri, clientService, clientService);
@@ -216,7 +216,7 @@ public class ClientNetworkController {
         // Configure logging.
         DOMConfigurator.configure("./log4j.xml");
 
-        final ClientNetworkController main = new ClientNetworkController();
+        final ClientNetwork main = new ClientNetwork();
 
         main.start(null);
 

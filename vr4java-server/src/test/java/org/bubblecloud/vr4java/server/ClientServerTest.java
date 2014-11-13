@@ -1,9 +1,9 @@
 package org.bubblecloud.vr4java.server;
 
 import org.apache.log4j.Logger;
+import org.bubblecloud.vr4java.client.ClientNetwork;
 import org.junit.Assert;
 import org.bubblecloud.vr4java.api.SceneServiceListener;
-import org.bubblecloud.vr4java.client.ClientNetworkController;
 import org.bubblecloud.vr4java.model.CuboidNode;
 import org.bubblecloud.vr4java.model.SceneNode;
 import org.bubblecloud.vr4java.model.Scene;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class ClientServerTest {
     private static final Logger LOGGER = Logger.getLogger(ClientServerTest.class.getName());
     private final ServerMain serverMain = new ServerMain();
-    private ClientNetworkController clientNetworkController;
+    private ClientNetwork clientNetwork;
 
     @Before
     public void before() throws Exception {
@@ -44,17 +44,17 @@ public class ClientServerTest {
     @Test
     public void testNetwork() throws Exception {
         PropertiesUtil.setCategoryRedirection("vr4java-client", "vr4java-test");
-        clientNetworkController = new ClientNetworkController();
-        clientNetworkController.start(null);
+        clientNetwork = new ClientNetwork();
+        clientNetwork.start(null);
 
         Thread.sleep(200);
 
-        final Scene scene = clientNetworkController.getScenes().values().iterator().next();
+        final Scene scene = clientNetwork.getScenes().values().iterator().next();
 
         final CuboidNode node = new CuboidNode();
         node.setId(UUID.randomUUID());
         node.setName("Avatar" + node.getId().hashCode());
-        node.setOwnerCertificateFingerprint(clientNetworkController.getFingerprint());
+        node.setOwnerCertificateFingerprint(clientNetwork.getFingerprint());
         node.setTexture("");
         node.setPersistent(false);
 
@@ -62,19 +62,19 @@ public class ClientServerTest {
         nodeList.add(node);
         final List<UUID> nodeIdList = Collections.singletonList(node.getId());
 
-        clientNetworkController.addNodes(scene, nodeList);
-        clientNetworkController.setNodesDynamic(scene, nodeIdList);
+        clientNetwork.addNodes(scene, nodeList);
+        clientNetwork.setNodesDynamic(scene, nodeIdList);
 
         node.setX(1);
 
-        clientNetworkController.setSceneStateSlug(scene, nodeList);
+        clientNetwork.setSceneStateSlug(scene, nodeList);
 
         Thread.sleep(500);
 
         // Added default scene content.
-        Assert.assertEquals(5, clientNetworkController.getClientService().getNodes(scene.getId()).size());
+        Assert.assertEquals(5, clientNetwork.getClientService().getNodes(scene.getId()).size());
 
-        clientNetworkController.addSceneServiceListener(new SceneServiceListener() {
+        clientNetwork.addSceneServiceListener(new SceneServiceListener() {
             @Override
             public void onAddNodes(UUID sceneId, List<UUID> nodeIds) {
 
@@ -117,13 +117,13 @@ public class ClientServerTest {
             }
         });
 
-        clientNetworkController.playNodeAudio(scene.getId(), node.getId(), "test".getBytes());
+        clientNetwork.playNodeAudio(scene.getId(), node.getId(), "test".getBytes());
         while (receivedNodeAudioBytes == null) {
             Thread.sleep(100);
         }
         Assert.assertEquals("test", new String(receivedNodeAudioBytes));
 
-        clientNetworkController.stop();
+        clientNetwork.stop();
 
     }
 

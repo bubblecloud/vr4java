@@ -9,7 +9,6 @@ import com.jme3.light.DirectionalLight;
 import com.jme3.material.MatParam;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -19,15 +18,12 @@ import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.scene.shape.Torus;
 import org.apache.log4j.Logger;
+import org.bubblecloud.vr4java.api.SceneService;
 import org.bubblecloud.vr4java.api.SceneServiceListener;
-import org.bubblecloud.vr4java.client.ClientNetworkController;
-import org.bubblecloud.vr4java.client.ClientRpcService;
+import org.bubblecloud.vr4java.client.ClientNetwork;
 import org.bubblecloud.vr4java.model.*;
-import org.bubblecloud.vr4java.util.VrConstants;
-import org.eclipse.persistence.internal.jaxb.many.MapEntry;
 import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -42,8 +38,8 @@ public class SceneController implements SceneServiceListener {
     private AssetManager assetManager;
     private PhysicsSpace physicsSpace;
     private SteeringController steeringController;
-    private ClientNetworkController networkController;
-    private final ClientRpcService clientRpcService;
+    private ClientNetwork networkController;
+    private final SceneService sceneService;
 
     private com.jme3.scene.Node rootNode;
     private CharacterAnimator characterAnimator;
@@ -64,10 +60,10 @@ public class SceneController implements SceneServiceListener {
 
     public SceneController(final SceneContext sceneContext) {
         this.sceneContext = sceneContext;
-        this.networkController = sceneContext.getClientNetworkController();
+        this.networkController = sceneContext.getClientNetwork();
         scene = networkController.getScenes().values().iterator().next();
 
-        clientRpcService = networkController.getClientService();
+        sceneService = networkController.getClientService().getSceneService();
         this.assetManager = sceneContext.getAssetManager();
         this.physicsSpace = sceneContext.getPhysicsSpace();
         this.rootNode = sceneContext.getRootNode();
@@ -82,6 +78,24 @@ public class SceneController implements SceneServiceListener {
 
     }
 
+    public Scene getScene() {
+        return scene;
+    }
+
+    public Map<UUID, Spatial> getSpatials() {
+        return spatials;
+    }
+
+    public SceneNode getNodeBySpatial(final Spatial spatial) {
+        for (final Map.Entry<UUID, Spatial> spatialMapEntry : spatials.entrySet()) {
+            if (spatialMapEntry.getValue().equals(spatial)) {
+                final UUID nodeId = spatialMapEntry.getKey();
+                return sceneService.getNode(scene.getId(), nodeId);
+            }
+        }
+        return null;
+    }
+
     public void update(final float tpf) {
         final SceneNode characterNode = sceneContext.getCharacter().getSceneNode();
         final Spatial characterSpatial = sceneContext.getCharacter().getSpatial();
@@ -89,17 +103,17 @@ public class SceneController implements SceneServiceListener {
         updateNodeTransformation(characterSpatial, characterNode);
 
         synchronized (addedNodes) {
-            final List<SceneNode> nodes = clientRpcService.getNodes(scene.getId(), new ArrayList(addedNodes));
+            final List<SceneNode> nodes = sceneService.getNodes(scene.getId(), new ArrayList(addedNodes));
             addNodes(nodes);
             addedNodes.clear();
         }
         synchronized (updatedNodes) {
-            final List<SceneNode> nodes = clientRpcService.getNodes(scene.getId(), new ArrayList(updatedNodes));
+            final List<SceneNode> nodes = sceneService.getNodes(scene.getId(), new ArrayList(updatedNodes));
             updateNodes(nodes);
             updatedNodes.clear();
         }
         synchronized (sluggedNodes) {
-            final List<SceneNode> nodes = clientRpcService.getNodes(scene.getId(), new ArrayList(sluggedNodes));
+            final List<SceneNode> nodes = sceneService.getNodes(scene.getId(), new ArrayList(sluggedNodes));
             slugNodes(nodes);
             sluggedNodes.clear();
         }
@@ -108,7 +122,7 @@ public class SceneController implements SceneServiceListener {
             removedNodes.clear();
         }
 
-        final List<SceneNode> nodes = clientRpcService.getNodes(scene.getId(), new ArrayList(spatials.keySet()));
+        final List<SceneNode> nodes = sceneService.getNodes(scene.getId(), new ArrayList(spatials.keySet()));
         interpolateNodes(tpf, nodes);
     }
 
@@ -336,6 +350,7 @@ public class SceneController implements SceneServiceListener {
                     final MatParam ambientColorParam = material.getParam("Ambient");
                     final ColorRGBA ambientColor = (ColorRGBA) ambientColorParam.getValue();
                     final boolean highlighted = ambientColor.equals(ColorRGBA.White);
+                    final SceneNode editedNode = sceneContext.getEditController().getEditedNode();
                     final boolean edited = editedNode != null && sceneNode.getId().equals(editedNode.getId());
                     if (edited && !highlighted) {
                         material.setColor("Ambient", ColorRGBA.White);
@@ -498,107 +513,4 @@ public class SceneController implements SceneServiceListener {
         dynamicNodes = modifiedDynamicNodes;
     }
 
-    private SceneNode editedNode;
-
-    public void addEditNode(final NodeType nodeType) {
-        if (editedNode != null) {
-            LOGGER.warn("Already editing new node.");
-            return;
-        }
-        if (nodeType.equals(NodeType.CUBOID)) {
-            editedNode = new CuboidNode(1f, 1f, 1f, 1.0f,
-                    "jme3-open-asset-pack-v1/textures/rose_fisher_grassy_gradient.jpg");
-            editedNode.setScene(scene);
-            editedNode.setName(UUID.randomUUID().toString());
-            final Vector3f characterLocation = sceneContext.getCharacter().getSpatial().getWorldTranslation();
-            final Vector3f nodeLocation = characterLocation.add(
-                    sceneContext.getCharacter().getCharacterControl().getViewDirection().normalize().mult(2f));
-            editedNode.setTranslation(new org.bubblecloud.vecmath.Vector3f(
-                    nodeLocation.getX() - nodeLocation.getX() % VrConstants.GRID_STEP_TRANSLATION,
-                    nodeLocation.getY() - nodeLocation.getY() % VrConstants.GRID_STEP_TRANSLATION,
-                    nodeLocation.getZ() - nodeLocation.getZ() % VrConstants.GRID_STEP_TRANSLATION
-            ));
-            editedNode.setRotation(new org.bubblecloud.vecmath.Quaternion());
-            editedNode.setPersistent(false);
-
-            addDynamicNode(editedNode);
-
-            editedNode.setId(networkController.calculateGlobalId(editedNode.getName()));
-            networkController.addNodes(scene, Collections.singletonList(editedNode));
-            networkController.setNodesDynamic(scene, Collections.singletonList(editedNode.getId()));
-        }
-    }
-
-    public void translateEditNode(final Vector3f translation) {
-        if (editedNode == null) {
-            LOGGER.warn("Not editing a node.");
-            return;
-        }
-        final org.bubblecloud.vecmath.Vector3f location = editedNode.getTranslation();
-        editedNode.setTranslation(location.add(new org.bubblecloud.vecmath.Vector3f(translation.x, translation.y, translation.z)));
-    }
-
-    public void rotateEditNode(final Quaternion rotation_) {
-        if (editedNode == null) {
-            LOGGER.warn("Not editing a node.");
-            return;
-        }
-        final org.bubblecloud.vecmath.Quaternion orientation = editedNode.getRotation();
-        final org.bubblecloud.vecmath.Quaternion rotation = new org.bubblecloud.vecmath.Quaternion(rotation_.getX(),
-                rotation_.getY(), rotation_.getZ(), rotation_.getW());
-        final org.bubblecloud.vecmath.Quaternion newOrientation = rotation.mult(orientation);
-        editedNode.setRotation(newOrientation);
-    }
-
-    public void resetEditNodeRotation() {
-        if (editedNode == null) {
-            LOGGER.warn("Not editing a node.");
-            return;
-        }
-        editedNode.setRotation(new org.bubblecloud.vecmath.Quaternion());
-    }
-
-    public void removeEditNode() {
-        if (editedNode == null) {
-            LOGGER.warn("Not editing a node.");
-            return;
-        }
-        removeDynamicNode(editedNode);
-        networkController.setNodesStatic(scene, Arrays.asList(editedNode.getId()));
-        networkController.removeNodes(scene, Collections.singletonList(editedNode.getId()));
-        editedNode = null;
-    }
-
-    public void saveEditNode() {
-        if (editedNode == null) {
-            LOGGER.warn("Not editing a node.");
-            return;
-        }
-        removeDynamicNode(editedNode);
-        networkController.setNodesStatic(scene, Arrays.asList(editedNode.getId()));
-
-        editedNode.setPersistent(true);
-        networkController.updateNodes(scene, Arrays.asList(editedNode));
-        editedNode = null;
-    }
-
-    public void selectEditNode(final Spatial spatial) {
-        if (editedNode != null) {
-            saveEditNode();
-        }
-
-        for (final Map.Entry<UUID, Spatial> spatialMapEntry : spatials.entrySet()) {
-            if (spatialMapEntry.getValue().equals(spatial)) {
-                final UUID nodeId = spatialMapEntry.getKey();
-                final List<SceneNode> nodes = clientRpcService.getNodes(scene.getId(), Arrays.asList(nodeId));
-                if (nodes.size() == 1) {
-
-                    editedNode = nodes.get(0).clone();
-                    addDynamicNode(editedNode);
-                    networkController.setNodesDynamic(scene, Arrays.asList(editedNode.getId()));
-
-                }
-            }
-        }
-    }
 }

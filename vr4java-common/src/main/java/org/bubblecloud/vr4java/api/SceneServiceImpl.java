@@ -138,6 +138,18 @@ public class SceneServiceImpl implements SceneService {
     }
 
     @Override
+    public SceneNode getNode(UUID sceneId, UUID id) {
+        final Scene scene = scenes.get(sceneId);
+        if (scene == null) {
+            LOGGER.warn("Scene does not exist: " + sceneId);
+            throw new IllegalArgumentException("Scene does not exist: " + sceneId);
+        }
+        synchronized (scene) {
+            return models.get(sceneId).getNode(id);
+        }
+    }
+
+    @Override
     public List<SceneNode> getNodes(UUID sceneId, List<UUID> ids) {
         final Scene scene = scenes.get(sceneId);
         if (scene == null) {

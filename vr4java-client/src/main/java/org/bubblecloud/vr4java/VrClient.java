@@ -9,7 +9,7 @@ import com.jme3.math.*;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.AppSettings;
 import org.apache.log4j.Logger;
-import org.bubblecloud.vr4java.client.ClientNetworkController;
+import org.bubblecloud.vr4java.client.ClientNetwork;
 import org.bubblecloud.vr4java.client.ClientNetworkStartupListener;
 import org.bubblecloud.vr4java.ui.*;
 
@@ -25,7 +25,7 @@ import java.util.prefs.BackingStoreException;
 public class VrClient extends SimpleApplication {
     private static final Logger LOGGER = Logger.getLogger(VrClient.class.getName());
 
-    private final ClientNetworkController clientNetworkController;
+    private final ClientNetwork clientNetwork;
     private SceneContext sceneContext;
 
     public static void main(String[] args) {
@@ -55,9 +55,9 @@ public class VrClient extends SimpleApplication {
 
             final VrSplash vrSplash = new VrSplash();
 
-            final ClientNetworkController clientNetworkController = new ClientNetworkController();
+            final ClientNetwork clientNetwork = new ClientNetwork();
             try {
-                clientNetworkController.start(new ClientNetworkStartupListener() {
+                clientNetwork.start(new ClientNetworkStartupListener() {
                     @Override
                     public void message(String message) {
                         vrSplash.render(message);
@@ -79,7 +79,7 @@ public class VrClient extends SimpleApplication {
                 LOGGER.info("Error loading settings", e);
             }
 
-            final VrClient app = new VrClient(clientNetworkController);
+            final VrClient app = new VrClient(clientNetwork);
             app.setSettings(appSettings);
             app.setShowSettings(true);
             app.start();
@@ -92,7 +92,7 @@ public class VrClient extends SimpleApplication {
                     } catch (BackingStoreException e) {
                         LOGGER.info("Error saving settings", e);
                     }
-                    clientNetworkController.stop();
+                    clientNetwork.stop();
                 }
             };
             shutdownAppState.setEnabled(true);
@@ -102,8 +102,8 @@ public class VrClient extends SimpleApplication {
         }
     }
 
-    public VrClient(ClientNetworkController clientNetworkController) {
-        this.clientNetworkController = clientNetworkController;
+    public VrClient(ClientNetwork clientNetwork) {
+        this.clientNetwork = clientNetwork;
     }
 
     @Override
@@ -121,7 +121,7 @@ public class VrClient extends SimpleApplication {
         sceneContext = new SceneContext();
         sceneContext.setAudioRecordController(new AudioRecordController(sceneContext));
         sceneContext.setAudioPlaybackController(new AudioPlaybackController(sceneContext));
-        sceneContext.setClientNetworkController(clientNetworkController);
+        sceneContext.setClientNetwork(clientNetwork);
         sceneContext.setInputManager(inputManager);
         sceneContext.setAssetManager(assetManager);
         sceneContext.setCamera(cam);
@@ -131,6 +131,7 @@ public class VrClient extends SimpleApplication {
         sceneContext.setSteeringController(new SteeringController(sceneContext));
 
         sceneContext.setSceneController(new SceneController(sceneContext));
+        sceneContext.setEditController(new EditController(sceneContext));
         sceneContext.getSceneController().loadScene();
 
         final org.bubblecloud.vr4java.ui.Character character = sceneContext.getSceneController().addCharacter();
@@ -141,6 +142,7 @@ public class VrClient extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         sceneContext.getSteeringController().update(tpf);
+        sceneContext.getEditController().update(tpf);
         sceneContext.getSceneController().update(tpf);
         sceneContext.getCharacter().getCharacterAnimator().update(tpf);
     }
