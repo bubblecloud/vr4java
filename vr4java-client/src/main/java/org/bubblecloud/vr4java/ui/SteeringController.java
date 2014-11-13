@@ -429,6 +429,26 @@ public class SteeringController implements ActionListener, RawInputListener {
             sceneContext.getClientNetwork().updateNodes(sceneContext.getSceneController().getScene(),
                     Arrays.asList((SceneNode) cuboid));
         }
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD7 && evt.isReleased()) {
+            final SceneNode node = sceneContext.getEditController().getEditedNode();
+            if (node == null || !(node instanceof CuboidNode)) {
+                return;
+            }
+            final CuboidNode cuboid = (CuboidNode) node;
+            cuboid.setDimensionY(cuboid.getDimensionY() + VrConstants.GRID_STEP_TRANSLATION);
+            sceneContext.getClientNetwork().updateNodes(sceneContext.getSceneController().getScene(),
+                    Arrays.asList((SceneNode) cuboid));
+        }
+        if (evt.getKeyCode() == KeyInput.KEY_NUMPAD9 && evt.isReleased()) {
+            final SceneNode node = sceneContext.getEditController().getEditedNode();
+            if (node == null || !(node instanceof CuboidNode)) {
+                return;
+            }
+            final CuboidNode cuboid = (CuboidNode) node;
+            cuboid.setDimensionY(cuboid.getDimensionY() - VrConstants.GRID_STEP_TRANSLATION);
+            sceneContext.getClientNetwork().updateNodes(sceneContext.getSceneController().getScene(),
+                    Arrays.asList((SceneNode) cuboid));
+        }
     }
 
     private void translateAndSnapEditNode(Vector3f delta) {
