@@ -306,6 +306,10 @@ public class SteeringController implements ActionListener, RawInputListener {
                         sceneContext.getEditController().getEditedNode().setTranslation(translation);
                     }
                 }
+            } else {
+                if (sceneContext.getEditController().getEditedNode() != null) {
+                    sceneContext.getEditController().saveEditNode();
+                }
             }
         }
     }
