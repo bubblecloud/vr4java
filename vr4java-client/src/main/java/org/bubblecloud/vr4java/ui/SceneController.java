@@ -476,7 +476,7 @@ public class SceneController implements SceneServiceListener {
 
     public Character addCharacter() {
         final String name = "Character";
-        final String modelName = "jme3-open-asset-pack-v1/character/human/male/ogre/male.scene";
+        final String modelName = PropertiesUtil.getProperty("vr4java-client", "character-model");
 
         final Spatial model = assetManager.loadModel(modelName);
         final com.jme3.scene.Node characterNode = new com.jme3.scene.Node(name);
