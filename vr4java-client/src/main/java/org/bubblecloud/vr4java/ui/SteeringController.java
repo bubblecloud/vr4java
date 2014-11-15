@@ -319,6 +319,11 @@ public class SteeringController implements ActionListener, RawInputListener {
             }
         }
 
+        if (evt.getKeyCode() == KeyInput.KEY_F12 && evt.isReleased()) {
+            sceneContext.getEditController().setEditMode(!sceneContext.getEditController().isEditMode());
+            LOGGER.info("Edit mode: " + sceneContext.getEditController().isEditMode());
+        }
+
         if (evt.getKeyCode() == KeyInput.KEY_INSERT && evt.isReleased()) {
             sceneContext.getEditController().addEditNode(NodeType.CUBOID);
         }

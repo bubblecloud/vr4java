@@ -24,12 +24,21 @@ public class EditController {
     private SceneController sceneController;
     private ClientNetwork clientNetwork;
     private SceneService sceneService;
+    private boolean editMode = false;
 
     public EditController(final SceneContext sceneContext) {
         this.sceneContext = sceneContext;
         this.sceneController = sceneContext.getSceneController();
         this.clientNetwork = sceneContext.getClientNetwork();
         this.sceneService = clientNetwork.getClientService().getSceneService();
+    }
+
+    public boolean isEditMode() {
+        return editMode;
+    }
+
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
     }
 
     public void update(float tpf) {
@@ -43,6 +52,11 @@ public class EditController {
     private SceneNode editedNode;
 
     public void addEditNode(final NodeType nodeType) {
+        if (!editMode) {
+            LOGGER.warn("Not in edit mode.");
+            return;
+        }
+
         if (nodeType.equals(NodeType.CUBOID)) {
             if (editedNode != null) {
                 final SceneNode newNode = editedNode.clone();
@@ -74,19 +88,29 @@ public class EditController {
     }
 
     public void moveEditNode(final Vector3f translation) {
+        if (!editMode) {
+            LOGGER.warn("Not in edit mode.");
+            return;
+        }
         if (editedNode == null) {
             LOGGER.warn("Not editing a node.");
             return;
         }
+
         final org.bubblecloud.vecmath.Vector3f location = editedNode.getTranslation();
         editedNode.setTranslation(location.add(new org.bubblecloud.vecmath.Vector3f(translation.x, translation.y, translation.z)));
     }
 
     public void rotate(final Quaternion rotation_) {
+        if (!editMode) {
+            LOGGER.warn("Not in edit mode.");
+            return;
+        }
         if (editedNode == null) {
             LOGGER.warn("Not editing a node.");
             return;
         }
+
         final org.bubblecloud.vecmath.Quaternion orientation = editedNode.getRotation();
         final org.bubblecloud.vecmath.Quaternion rotation = new org.bubblecloud.vecmath.Quaternion(rotation_.getX(),
                 rotation_.getY(), rotation_.getZ(), rotation_.getW());
@@ -95,10 +119,15 @@ public class EditController {
     }
 
     public void moveAndSnapToGrid(final Vector3f translationDelta) {
+        if (!editMode) {
+            LOGGER.warn("Not in edit mode.");
+            return;
+        }
         if (editedNode == null) {
             LOGGER.warn("Not editing a node.");
             return;
         }
+
         final org.bubblecloud.vecmath.Vector3f translation = new org.bubblecloud.vecmath.Vector3f(
                 translationDelta.x,
                 translationDelta.y,
@@ -109,15 +138,24 @@ public class EditController {
     }
 
     public void setTranslationAndSnapToGrid(org.bubblecloud.vecmath.Vector3f translation) {
+        if (!editMode) {
+            LOGGER.warn("Not in edit mode.");
+            return;
+        }
         if (editedNode == null) {
             LOGGER.warn("Not editing a node.");
             return;
         }
+
         snapToGrid(translation);
         editedNode.setTranslation(translation);
     }
 
     public void resetEditNodeRotation() {
+        if (!editMode) {
+            LOGGER.warn("Not in edit mode.");
+            return;
+        }
         if (editedNode == null) {
             LOGGER.warn("Not editing a node.");
             return;
@@ -127,6 +165,10 @@ public class EditController {
     }
 
     public void removeEditNode() {
+        if (!editMode) {
+            LOGGER.warn("Not in edit mode.");
+            return;
+        }
         if (editedNode == null) {
             LOGGER.warn("Not editing a node.");
             return;
@@ -140,6 +182,10 @@ public class EditController {
     }
 
     public void saveEditNode() {
+        if (!editMode) {
+            LOGGER.warn("Not in edit mode.");
+            return;
+        }
         if (editedNode == null) {
             LOGGER.warn("Not editing a node.");
             return;
@@ -155,6 +201,10 @@ public class EditController {
     }
 
     public boolean selectEditNode(final Spatial spatial) {
+        if (!editMode) {
+            LOGGER.warn("Not in edit mode.");
+            return false;
+        }
         if (editedNode != null) {
             saveEditNode();
         }
