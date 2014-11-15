@@ -15,10 +15,8 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Spatial;
 import org.apache.log4j.Logger;
-import org.bubblecloud.vr4java.client.ClientRpcService;
 import org.bubblecloud.vr4java.model.CuboidNode;
 import org.bubblecloud.vr4java.model.NodeType;
-import org.bubblecloud.vr4java.model.Scene;
 import org.bubblecloud.vr4java.model.SceneNode;
 import org.bubblecloud.vr4java.util.VrConstants;
 
@@ -219,7 +217,7 @@ public class SteeringController implements ActionListener, RawInputListener {
 
     @Override
     public void onMouseMotionEvent(MouseMotionEvent evt) {
-        if (mouseDragDown) {
+        if (mouseDrag) {
             final int z = evt.getDeltaWheel();
 
             final Vector2f drag2d = inputManager.getCursorPosition();
@@ -233,21 +231,12 @@ public class SteeringController implements ActionListener, RawInputListener {
             final Vector3f coordinate = drag3d.add(dir.mult(objectDistance));
 
             final Vector3f dragDelta3d = coordinate.subtract(dragLastCoordinate);
-            sceneContext.getEditController().translateEditNode(dragDelta3d);
+            sceneContext.getEditController().moveEditNode(dragDelta3d);
 
             dragLastDir = dir;
             dragLastCoordinate = coordinate;
             dragLastObjectDistance = objectDistance;
         }
-    }
-
-    private void snapToGrid(org.bubblecloud.vecmath.Vector3f coordinate) {
-        coordinate.x += Math.signum(coordinate.x) * VrConstants.GRID_STEP_TRANSLATION / 2;
-        coordinate.y += Math.signum(coordinate.y) * VrConstants.GRID_STEP_TRANSLATION / 2;
-        coordinate.z += Math.signum(coordinate.z) * VrConstants.GRID_STEP_TRANSLATION / 2;
-        coordinate.x = coordinate.x - (coordinate.x) % VrConstants.GRID_STEP_TRANSLATION;
-        coordinate.y = coordinate.y - (coordinate.y) % VrConstants.GRID_STEP_TRANSLATION;
-        coordinate.z = coordinate.z - (coordinate.z) % VrConstants.GRID_STEP_TRANSLATION;
     }
 
     private long dragLastStartTimeMillis;
@@ -256,7 +245,7 @@ public class SteeringController implements ActionListener, RawInputListener {
     @Override
     public void onMouseButtonEvent(MouseButtonEvent evt) {
         if (evt.getButtonIndex() == MouseInput.BUTTON_LEFT && evt.isPressed()) {
-            if (!mouseDragDown) {
+            if (!mouseDrag) {
                 final CollisionResults results = new CollisionResults();
                 final Vector2f click2d = inputManager.getCursorPosition();
                 final Vector3f click3d = sceneContext.getCamera().getWorldCoordinates(
@@ -278,7 +267,7 @@ public class SteeringController implements ActionListener, RawInputListener {
 
                     final SceneNode lastSceneNode = sceneContext.getEditController().getEditedNode();
                     if (sceneContext.getEditController().selectEditNode(spatial)) {
-                        mouseDragDown = true;
+                        mouseDrag = true;
                         dragLastDir = dir;
                         dragLastObjectDistance = distance;
                         dragLastCoordinate = location;
@@ -292,18 +281,16 @@ public class SteeringController implements ActionListener, RawInputListener {
             }
         }
         if (evt.getButtonIndex() == MouseInput.BUTTON_LEFT && evt.isReleased()) {
-            if (mouseDragDown) {
-                mouseDragDown = false;
+            if (mouseDrag) {
+                mouseDrag = false;
                 if (sceneContext.getEditController().getEditedNode() != null) {
                     if (System.currentTimeMillis() - dragLastStartTimeMillis < 300) {
                         if (!lastClickWasSelect) {
                             sceneContext.getEditController().saveEditNode();
                         }
                     } else {
-                        final org.bubblecloud.vecmath.Vector3f translation =
-                                sceneContext.getEditController().getEditedNode().getTranslation();
-                        snapToGrid(translation);
-                        sceneContext.getEditController().getEditedNode().setTranslation(translation);
+                        sceneContext.getEditController().setTranslationAndSnapToGrid(
+                                sceneContext.getEditController().getEditedNode().getTranslation());
                     }
                 }
             } else {
@@ -314,20 +301,20 @@ public class SteeringController implements ActionListener, RawInputListener {
         }
     }
 
-    private boolean pressToTalkDown = false;
-    private boolean mouseDragDown = false;
+    private boolean pressToTalk = false;
+    private boolean mouseDrag = false;
 
     @Override
     public void onKeyEvent(KeyInputEvent evt) {
         if (evt.getKeyCode() == KeyInput.KEY_LCONTROL) {
             if (evt.isPressed()) {
-                if (!pressToTalkDown) {
-                    pressToTalkDown = true;
+                if (!pressToTalk) {
+                    pressToTalk = true;
                     onTalkBegin();
                 }
             }
             if (evt.isReleased()) {
-                pressToTalkDown = false;
+                pressToTalk = false;
                 onTalkEnd();
             }
         }
@@ -340,22 +327,22 @@ public class SteeringController implements ActionListener, RawInputListener {
         }
 
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD4 && evt.isReleased()) {
-            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
+            sceneContext.getEditController().rotate(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD6 && evt.isReleased()) {
-            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
+            sceneContext.getEditController().rotate(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 1f, 0)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD8 && evt.isReleased()) {
-            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 0, 1f)));
+            sceneContext.getEditController().rotate(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 0, 1f)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD2 && evt.isReleased()) {
-            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 0, 1f)));
+            sceneContext.getEditController().rotate(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(0, 0, 1f)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD3 && evt.isReleased()) {
-            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(1f, 0, 0)));
+            sceneContext.getEditController().rotate(new Quaternion().fromAngleAxis(-VrConstants.GRID_STEP_ROTATION, new Vector3f(1f, 0, 0)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD1 && evt.isReleased()) {
-            sceneContext.getEditController().rotateEditNode(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(1f, 0, 0)));
+            sceneContext.getEditController().rotate(new Quaternion().fromAngleAxis(VrConstants.GRID_STEP_ROTATION, new Vector3f(1f, 0, 0)));
         }
         if (evt.getKeyCode() == KeyInput.KEY_NUMPAD5 && evt.isReleased()) {
             sceneContext.getEditController().resetEditNodeRotation();
@@ -363,28 +350,28 @@ public class SteeringController implements ActionListener, RawInputListener {
 
         if (evt.getKeyCode() == KeyInput.KEY_PGUP && evt.isReleased()) {
             final Vector3f delta = sceneContext.getCamera().getUp().mult(VrConstants.GRID_STEP_TRANSLATION);
-            translateAndSnapEditNode(delta);
+            sceneContext.getEditController().moveAndSnapToGrid(delta);
         }
         if (evt.getKeyCode() == KeyInput.KEY_PGDN && evt.isReleased()) {
             final Vector3f delta = sceneContext.getCamera().getUp().mult(-VrConstants.GRID_STEP_TRANSLATION);
-            translateAndSnapEditNode(delta);
+            sceneContext.getEditController().moveAndSnapToGrid(delta);
         }
 
         if (evt.getKeyCode() == KeyInput.KEY_UP && evt.isReleased()) {
             final Vector3f delta = sceneContext.getCamera().getDirection().mult(VrConstants.GRID_STEP_TRANSLATION);
-            translateAndSnapEditNode(delta);
+            sceneContext.getEditController().moveAndSnapToGrid(delta);
         }
         if (evt.getKeyCode() == KeyInput.KEY_DOWN && evt.isReleased()) {
             final Vector3f delta = sceneContext.getCamera().getDirection().mult(-VrConstants.GRID_STEP_TRANSLATION);
-            translateAndSnapEditNode(delta);
+            sceneContext.getEditController().moveAndSnapToGrid(delta);
         }
         if (evt.getKeyCode() == KeyInput.KEY_LEFT && evt.isReleased()) {
             final Vector3f delta = sceneContext.getCamera().getLeft().mult(VrConstants.GRID_STEP_TRANSLATION);
-            translateAndSnapEditNode(delta);
+            sceneContext.getEditController().moveAndSnapToGrid(delta);
         }
         if (evt.getKeyCode() == KeyInput.KEY_RIGHT && evt.isReleased()) {
             final Vector3f delta = sceneContext.getCamera().getLeft().mult(-VrConstants.GRID_STEP_TRANSLATION);
-            translateAndSnapEditNode(delta);
+            sceneContext.getEditController().moveAndSnapToGrid(delta);
         }
 
         if (evt.getKeyCode() == KeyInput.KEY_ADD && evt.isReleased()) {
@@ -453,21 +440,6 @@ public class SteeringController implements ActionListener, RawInputListener {
             sceneContext.getClientNetwork().updateNodes(sceneContext.getSceneController().getScene(),
                     Arrays.asList((SceneNode) cuboid));
         }
-    }
-
-    private void translateAndSnapEditNode(Vector3f delta) {
-        final SceneNode node = sceneContext.getEditController().getEditedNode();
-        if (node == null) {
-            return;
-        }
-        final org.bubblecloud.vecmath.Vector3f translation = new org.bubblecloud.vecmath.Vector3f(
-                delta.x,
-                delta.y,
-                delta.z
-        );
-        final org.bubblecloud.vecmath.Vector3f location = node.getTranslation().add(translation);
-        snapToGrid(location);
-        node.setTranslation(location);
     }
 
     @Override

@@ -73,7 +73,7 @@ public class EditController {
         }
     }
 
-    public void translateEditNode(final Vector3f translation) {
+    public void moveEditNode(final Vector3f translation) {
         if (editedNode == null) {
             LOGGER.warn("Not editing a node.");
             return;
@@ -82,7 +82,7 @@ public class EditController {
         editedNode.setTranslation(location.add(new org.bubblecloud.vecmath.Vector3f(translation.x, translation.y, translation.z)));
     }
 
-    public void rotateEditNode(final Quaternion rotation_) {
+    public void rotate(final Quaternion rotation_) {
         if (editedNode == null) {
             LOGGER.warn("Not editing a node.");
             return;
@@ -92,6 +92,29 @@ public class EditController {
                 rotation_.getY(), rotation_.getZ(), rotation_.getW());
         final org.bubblecloud.vecmath.Quaternion newOrientation = rotation.mult(orientation);
         editedNode.setRotation(newOrientation);
+    }
+
+    public void moveAndSnapToGrid(final Vector3f translationDelta) {
+        if (editedNode == null) {
+            LOGGER.warn("Not editing a node.");
+            return;
+        }
+        final org.bubblecloud.vecmath.Vector3f translation = new org.bubblecloud.vecmath.Vector3f(
+                translationDelta.x,
+                translationDelta.y,
+                translationDelta.z
+        );
+        final org.bubblecloud.vecmath.Vector3f location = editedNode.getTranslation().add(translation);
+        setTranslationAndSnapToGrid(location);
+    }
+
+    public void setTranslationAndSnapToGrid(org.bubblecloud.vecmath.Vector3f translation) {
+        if (editedNode == null) {
+            LOGGER.warn("Not editing a node.");
+            return;
+        }
+        snapToGrid(translation);
+        editedNode.setTranslation(translation);
     }
 
     public void resetEditNodeRotation() {
@@ -147,4 +170,14 @@ public class EditController {
             return false;
         }
     }
+
+    private void snapToGrid(org.bubblecloud.vecmath.Vector3f coordinate) {
+        coordinate.x += Math.signum(coordinate.x) * VrConstants.GRID_STEP_TRANSLATION / 2;
+        coordinate.y += Math.signum(coordinate.y) * VrConstants.GRID_STEP_TRANSLATION / 2;
+        coordinate.z += Math.signum(coordinate.z) * VrConstants.GRID_STEP_TRANSLATION / 2;
+        coordinate.x = coordinate.x - (coordinate.x) % VrConstants.GRID_STEP_TRANSLATION;
+        coordinate.y = coordinate.y - (coordinate.y) % VrConstants.GRID_STEP_TRANSLATION;
+        coordinate.z = coordinate.z - (coordinate.z) % VrConstants.GRID_STEP_TRANSLATION;
+    }
+
 }
