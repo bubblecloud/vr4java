@@ -9,7 +9,6 @@ import com.jme3.light.DirectionalLight;
 import com.jme3.material.MatParam;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -22,6 +21,7 @@ import org.bubblecloud.vr4java.api.SceneService;
 import org.bubblecloud.vr4java.api.SceneServiceListener;
 import org.bubblecloud.vr4java.client.ClientNetwork;
 import org.bubblecloud.vr4java.model.*;
+import org.bubblecloud.vr4java.util.C;
 import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import java.util.*;
@@ -45,7 +45,7 @@ public class SceneController implements SceneServiceListener {
     private CharacterAnimator characterAnimator;
 
     private final Scene scene;
-    private List<SceneNode> dynamicNodes = new ArrayList<>();
+    private List<SceneNode> controlledNodes = new ArrayList<>();
 
     private Map<UUID, AnimationController> animationControllers = new HashMap<>();
     private Map<UUID, Spatial> spatials = new HashMap<>();
@@ -56,7 +56,7 @@ public class SceneController implements SceneServiceListener {
 
     private HashSet<UUID> removedNodes = new HashSet<>();
 
-    private HashSet<UUID> sluggedNodes = new HashSet<>();
+    private HashSet<UUID> slugUpdatedNodes = new HashSet<>();
 
     public SceneController(final SceneContext sceneContext) {
         this.sceneContext = sceneContext;
@@ -112,10 +112,10 @@ public class SceneController implements SceneServiceListener {
             updateNodes(nodes);
             updatedNodes.clear();
         }
-        synchronized (sluggedNodes) {
-            final List<SceneNode> nodes = sceneService.getNodes(scene.getId(), new ArrayList(sluggedNodes));
-            slugNodes(nodes);
-            sluggedNodes.clear();
+        synchronized (slugUpdatedNodes) {
+            final List<SceneNode> nodes = sceneService.getNodes(scene.getId(), new ArrayList(slugUpdatedNodes));
+            slugUpdateNode(nodes);
+            slugUpdatedNodes.clear();
         }
         synchronized (removedNodes) {
             removeNodes(removedNodes);
@@ -164,14 +164,14 @@ public class SceneController implements SceneServiceListener {
     public void onStateSlug(UUID sceneId, List<UUID> nodeIds) {
         //LOGGER.info("Scene " + sceneId + " on state slug for nodes: " + nodeIds);
 
-        synchronized (sluggedNodes) {
+        synchronized (slugUpdatedNodes) {
             if (sceneId.equals(scene.getId())) {
-                sluggedNodes.addAll(nodeIds);
+                slugUpdatedNodes.addAll(nodeIds);
             }
         }
 
         if (sceneId.equals(scene.getId())) {
-            networkController.setSceneStateSlug(scene, dynamicNodes);
+            networkController.setSceneStateSlug(scene, controlledNodes);
         }
     }
 
@@ -182,7 +182,7 @@ public class SceneController implements SceneServiceListener {
 
     @Override
     public void onSetNodesDynamic(UUID sceneId, List<UUID> ids, List<Integer> indexes) {
-        for (final SceneNode dynamicNode : dynamicNodes) {
+        for (final SceneNode dynamicNode : controlledNodes) {
             for (int i = 0; i < ids.size(); i++) {
                 final UUID id = ids.get(i);
                 if (dynamicNode.getId().equals(id)) {
@@ -203,23 +203,9 @@ public class SceneController implements SceneServiceListener {
         sceneContext.getAudioPlaybackController().playAudio(sceneId, nodeId, bytes);
     }
 
-    public void updateSpatialTransformation(SceneNode node, Spatial spatial) {
-        spatial.setLocalTranslation(new Vector3f(
-                node.getX() / 1000f,
-                node.getY() / 1000f,
-                node.getZ() / 1000f
-        ));
-        spatial.setLocalRotation(new Quaternion(
-                node.getAx() / 10000f,
-                node.getAy() / 10000f,
-                node.getAz() / 10000f,
-                node.getAw() / 10000f
-        ));
-    }
-
     public void addNodes(List<SceneNode> nodes) {
         for (final SceneNode node : nodes) {
-            /*for (SceneNode ownNode : dynamicNodes) {
+            /*for (SceneNode ownNode : controlledNodes) {
                 if (ownNode.getId().equals(node.getId())) {
                     LOGGER.debug("Updated node index: " + node.getId() + ":" + node.getIndex());
                     ownNode.setIndex(node.getIndex());
@@ -268,13 +254,13 @@ public class SceneController implements SceneServiceListener {
         }
         removeNodes(nodeIds);
         addNodes(nodes);
-        /*for (final SceneNode node : nodes) {
+        for (final SceneNode node : nodes) {
             final Spatial spatial = spatials.get(node.getId());
             if (spatial == null) {
                 continue;
             }
             updateSpatialTransformation(node, spatial);
-        }*/
+        }
     }
 
     public void removeNodes(HashSet<UUID> nodeIds) {
@@ -291,7 +277,7 @@ public class SceneController implements SceneServiceListener {
         }
     }
 
-    public void slugNodes(List<SceneNode> nodes) {
+    public void slugUpdateNode(List<SceneNode> nodes) {
         for (final SceneNode node : nodes) {
             final Spatial spatial = spatials.get(node.getId());
             if (spatial == null) {
@@ -305,18 +291,15 @@ public class SceneController implements SceneServiceListener {
         }
     }
 
-    public void updateNodeTransformation(Spatial spatial, SceneNode node) {
-        setNodeTransformation(node, spatial.getLocalTranslation(), spatial.getLocalRotation());
+
+    public void updateSpatialTransformation(SceneNode node, Spatial spatial) {
+        spatial.setLocalTranslation(C.c(node.getTranslation()));
+        spatial.setLocalRotation((C.c(node.getRotation())));
     }
 
-    public void setNodeTransformation(SceneNode node, Vector3f translation, Quaternion quaternion) {
-        node.setX((int) (translation.x * 1000));
-        node.setY((int) (translation.y * 1000));
-        node.setZ((int) (translation.z * 1000));
-        node.setAx((int) (quaternion.getX() * 10000));
-        node.setAy((int) (quaternion.getY() * 10000));
-        node.setAz((int) (quaternion.getZ() * 10000));
-        node.setAw((int) (quaternion.getW() * 10000));
+    public void updateNodeTransformation(Spatial spatial, SceneNode node) {
+        node.setTranslation(C.c(spatial.getLocalTranslation()));
+        node.setRotation(C.c(spatial.getLocalRotation()));
     }
 
     public void interpolateNodes(float tpf, List<SceneNode> nodes) {
@@ -331,20 +314,8 @@ public class SceneController implements SceneServiceListener {
             }
 
             if (sceneNode.interpolate(tpf)) {
-
-                spatial.setLocalTranslation(
-                        sceneNode.getInterpolatedTranslation().x,
-                        sceneNode.getInterpolatedTranslation().y,
-                        sceneNode.getInterpolatedTranslation().z);
-
-                spatial.setLocalRotation(
-                        new Quaternion(
-                                sceneNode.getInterpolatedRotation().getX(),
-                                sceneNode.getInterpolatedRotation().getY(),
-                                sceneNode.getInterpolatedRotation().getZ(),
-                                sceneNode.getInterpolatedRotation().getW()
-                        )
-                );
+                spatial.setLocalTranslation(C.c(sceneNode.getInterpolatedTranslation()));
+                spatial.setLocalRotation(C.c(sceneNode.getInterpolatedRotation()));
 
                 final RigidBodyControl rigidBodyControl = spatial.getControl(RigidBodyControl.class);
                 if (rigidBodyControl != null) {
@@ -443,6 +414,53 @@ public class SceneController implements SceneServiceListener {
         return spatial;
     }
 
+    public Character setupCharacter() {
+        final String name = "Character";
+        final String modelName = PropertiesUtil.getProperty("vr4java-client", "character-model");
+
+        final Spatial characterModel = assetManager.loadModel(modelName);
+        final com.jme3.scene.Node characterSpatial = new com.jme3.scene.Node(name);
+        rootNode.attachChild(characterSpatial);
+        characterSpatial.attachChild(characterModel);
+
+        final BetterCharacterControl characterControl = new BetterCharacterControl(0.5f, 2.5f, 8f);
+        characterSpatial.addControl(characterControl);
+        physicsSpace.add(characterControl);
+
+        final SceneNode characterNode = new ModelNode(modelName);
+        characterNode.setScene(scene);
+        characterNode.setPersistent(false);
+        characterNode.setName(name);
+        updateNodeTransformation(characterSpatial, characterNode);
+
+        addControlledNode(characterNode);
+
+        characterNode.setId(networkController.calculateGlobalId(characterNode.getName()));
+        networkController.addNodes(scene, Collections.singletonList(characterNode));
+        networkController.setNodesDynamic(scene, Collections.singletonList(characterNode.getId()));
+
+        characterAnimator = new CharacterAnimator(characterNode, characterModel, steeringController);
+
+        return new Character(characterNode, characterSpatial, characterAnimator, characterControl);
+    }
+
+    public void addControlledNode(final SceneNode sceneNode) {
+        final List<SceneNode> modifiedControlledNodes = Collections.synchronizedList(new ArrayList<>(controlledNodes));
+        modifiedControlledNodes.add(sceneNode);
+        controlledNodes = modifiedControlledNodes;
+    }
+
+    public void removeControlledNode(final SceneNode sceneNode) {
+        final List<SceneNode> modifiedControlledNodes = Collections.synchronizedList(new ArrayList<>(controlledNodes));
+        for (final SceneNode candidate : new ArrayList<SceneNode>(modifiedControlledNodes)) {
+            if (candidate.getId().equals(sceneNode.getId())) {
+                modifiedControlledNodes.remove(candidate);
+            }
+        }
+        controlledNodes = modifiedControlledNodes;
+    }
+
+
     public void loadScene() {
 
         if ("true".equals(PropertiesUtil.getProperty("vr4java-client", "test-objects"))) {
@@ -472,52 +490,6 @@ public class SceneController implements SceneServiceListener {
             }
         }
 
-    }
-
-    public Character addCharacter() {
-        final String name = "Character";
-        final String modelName = PropertiesUtil.getProperty("vr4java-client", "character-model");
-
-        final Spatial model = assetManager.loadModel(modelName);
-        final com.jme3.scene.Node characterNode = new com.jme3.scene.Node(name);
-        rootNode.attachChild(characterNode);
-        characterNode.attachChild(model);
-
-        final BetterCharacterControl characterControl = new BetterCharacterControl(0.5f, 2.5f, 8f);
-        characterNode.addControl(characterControl);
-        physicsSpace.add(characterControl);
-
-        final SceneNode sceneNode = new ModelNode(modelName);
-        sceneNode.setScene(scene);
-        sceneNode.setPersistent(false);
-        sceneNode.setName(name);
-        updateNodeTransformation(characterNode, sceneNode);
-
-        addDynamicNode(sceneNode);
-
-        sceneNode.setId(networkController.calculateGlobalId(sceneNode.getName()));
-        networkController.addNodes(scene, Collections.singletonList(sceneNode));
-        networkController.setNodesDynamic(scene, Collections.singletonList(sceneNode.getId()));
-
-        characterAnimator = new CharacterAnimator(sceneNode, model, steeringController);
-
-        return new Character(sceneNode, characterNode, characterAnimator, characterControl);
-    }
-
-    public void addDynamicNode(final SceneNode sceneNode) {
-        final List<SceneNode> modifiedDynamicNodes = Collections.synchronizedList(new ArrayList<>(dynamicNodes));
-        modifiedDynamicNodes.add(sceneNode);
-        dynamicNodes = modifiedDynamicNodes;
-    }
-
-    public void removeDynamicNode(final SceneNode sceneNode) {
-        final List<SceneNode> modifiedDynamicNodes = Collections.synchronizedList(new ArrayList<>(dynamicNodes));
-        for (final SceneNode candidate : new ArrayList<SceneNode>(modifiedDynamicNodes)) {
-            if (candidate.getId().equals(sceneNode.getId())) {
-                modifiedDynamicNodes.remove(candidate);
-            }
-        }
-        dynamicNodes = modifiedDynamicNodes;
     }
 
 }

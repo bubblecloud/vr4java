@@ -38,9 +38,9 @@ public class VrClient extends SimpleApplication {
             if (newInstaller.exists()) {
                 if (oldInstaller.exists() && newInstaller.lastModified() > oldInstaller.lastModified()) {
                     LOGGER.info("Deleting installer from the way of new installer.");
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                     oldInstaller.delete();
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 }
                 if (!oldInstaller.exists()) {
                     LOGGER.info("Renaming new installer as installer.");
@@ -134,7 +134,7 @@ public class VrClient extends SimpleApplication {
         sceneContext.setEditController(new EditController(sceneContext));
         sceneContext.getSceneController().loadScene();
 
-        final org.bubblecloud.vr4java.ui.Character character = sceneContext.getSceneController().addCharacter();
+        final org.bubblecloud.vr4java.ui.Character character = sceneContext.getSceneController().setupCharacter();
         sceneContext.setCharacter(character);
         sceneContext.getSteeringController().setCharacter(character);
     }

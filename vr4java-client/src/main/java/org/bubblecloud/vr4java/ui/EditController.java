@@ -9,6 +9,7 @@ import org.bubblecloud.vr4java.client.ClientNetwork;
 import org.bubblecloud.vr4java.model.CuboidNode;
 import org.bubblecloud.vr4java.model.NodeType;
 import org.bubblecloud.vr4java.model.SceneNode;
+import org.bubblecloud.vr4java.util.C;
 import org.bubblecloud.vr4java.util.VrConstants;
 
 import java.util.*;
@@ -68,18 +69,14 @@ public class EditController {
                 final Vector3f characterLocation = sceneContext.getCharacter().getSpatial().getWorldTranslation();
                 final Vector3f nodeLocation = characterLocation.add(
                         sceneContext.getCharacter().getCharacterControl().getViewDirection().normalize().mult(2f));
-                editedNode.setTranslation(new org.bubblecloud.vecmath.Vector3f(
-                        nodeLocation.getX() - nodeLocation.getX() % VrConstants.GRID_STEP_TRANSLATION,
-                        nodeLocation.getY() - nodeLocation.getY() % VrConstants.GRID_STEP_TRANSLATION,
-                        nodeLocation.getZ() - nodeLocation.getZ() % VrConstants.GRID_STEP_TRANSLATION
-                ));
+                editedNode.setTranslation(snapToGrid(C.c(nodeLocation)));
                 editedNode.setRotation(new org.bubblecloud.vecmath.Quaternion());
             }
 
             editedNode.setScene(sceneController.getScene());
             editedNode.setName(UUID.randomUUID().toString());
             editedNode.setPersistent(false);
-            sceneController.addDynamicNode(editedNode);
+            sceneController.addControlledNode(editedNode);
 
             editedNode.setId(clientNetwork.calculateGlobalId(editedNode.getName()));
             clientNetwork.addNodes(sceneController.getScene(), Collections.singletonList(editedNode));
@@ -128,11 +125,7 @@ public class EditController {
             return;
         }
 
-        final org.bubblecloud.vecmath.Vector3f translation = new org.bubblecloud.vecmath.Vector3f(
-                translationDelta.x,
-                translationDelta.y,
-                translationDelta.z
-        );
+        final org.bubblecloud.vecmath.Vector3f translation = C.c(translationDelta);
         final org.bubblecloud.vecmath.Vector3f location = editedNode.getTranslation().add(translation);
         setTranslationAndSnapToGrid(location);
     }
@@ -174,7 +167,7 @@ public class EditController {
             return;
         }
 
-        sceneController.removeDynamicNode(editedNode);
+        sceneController.removeControlledNode(editedNode);
         clientNetwork.setNodesStatic(sceneController.getScene(), Arrays.asList(editedNode.getId()));
         clientNetwork.removeNodes(sceneController.getScene(), Collections.singletonList(editedNode.getId()));
 
@@ -193,7 +186,7 @@ public class EditController {
 
         editedNode.setPersistent(true);
 
-        sceneController.removeDynamicNode(editedNode);
+        sceneController.removeControlledNode(editedNode);
         clientNetwork.setNodesStatic(sceneController.getScene(), Arrays.asList(editedNode.getId()));
         clientNetwork.updateNodes(sceneController.getScene(), Arrays.asList(editedNode));
 
@@ -212,7 +205,7 @@ public class EditController {
         final SceneNode node = sceneController.getNodeBySpatial(spatial);
         if (node != null) {
             editedNode = node.clone(); // Clone to detach this node from server slug updates.
-            sceneController.addDynamicNode(editedNode);
+            sceneController.addControlledNode(editedNode);
             clientNetwork.setNodesDynamic(sceneController.getScene(), Arrays.asList(editedNode.getId()));
             return true;
         } else {
@@ -221,13 +214,14 @@ public class EditController {
         }
     }
 
-    private void snapToGrid(org.bubblecloud.vecmath.Vector3f coordinate) {
+    private org.bubblecloud.vecmath.Vector3f snapToGrid(org.bubblecloud.vecmath.Vector3f coordinate) {
         coordinate.x += Math.signum(coordinate.x) * VrConstants.GRID_STEP_TRANSLATION / 2;
         coordinate.y += Math.signum(coordinate.y) * VrConstants.GRID_STEP_TRANSLATION / 2;
         coordinate.z += Math.signum(coordinate.z) * VrConstants.GRID_STEP_TRANSLATION / 2;
         coordinate.x = coordinate.x - (coordinate.x) % VrConstants.GRID_STEP_TRANSLATION;
         coordinate.y = coordinate.y - (coordinate.y) % VrConstants.GRID_STEP_TRANSLATION;
         coordinate.z = coordinate.z - (coordinate.z) % VrConstants.GRID_STEP_TRANSLATION;
+        return coordinate;
     }
 
 }
