@@ -47,11 +47,13 @@ public class ClientNetwork {
     private PackageService serverPackageService;
 
     private Map<UUID, Scene> scenes = new HashMap<>();
+    private final String userName;
 
     public ClientNetwork() {
+        userName = PropertiesUtil.getProperty("vr4java-client", "user-name");
         final URI uri = URI.create(rpcUrl);
         clientService = new ClientRpcService();
-        client = new RpcWsClient( PropertiesUtil.getProperty("vr4java-client", "user-name"), uri, clientService, clientService);
+        client = new RpcWsClient(userName, uri, clientService, clientService);
     }
 
     public UUID calculateGlobalId(final String identifier) {
@@ -232,5 +234,9 @@ public class ClientNetwork {
                 }
             }
         }));
+    }
+
+    public String getUserName() {
+        return userName;
     }
 }

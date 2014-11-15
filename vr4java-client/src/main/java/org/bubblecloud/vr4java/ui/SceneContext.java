@@ -23,6 +23,7 @@ public class SceneContext {
     private SceneController sceneController;
     private EditController editController;
     private SpeechSynthesiser speechSynthesiser;
+    private Aide aide;
 
     private AudioRecordController audioRecordController;
     private AudioPlaybackController audioPlaybackController;
@@ -131,5 +132,13 @@ public class SceneContext {
 
     public void setAudioPlaybackController(AudioPlaybackController audioPlaybackController) {
         this.audioPlaybackController = audioPlaybackController;
+    }
+
+    public Aide getAide() {
+        return aide;
+    }
+
+    public void setAide(Aide aide) {
+        this.aide = aide;
     }
 }

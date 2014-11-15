@@ -212,6 +212,7 @@ public class SceneController implements SceneServiceListener {
                 }
             }*/
             if (sceneContext.getCharacter().getSceneNode().getId().equals(node.getId())) {
+                sceneContext.getAide().onCharacterLoaded();
                 continue;
             }
 

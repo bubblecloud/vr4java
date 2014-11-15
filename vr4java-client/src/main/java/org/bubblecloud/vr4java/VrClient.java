@@ -135,8 +135,7 @@ public class VrClient extends SimpleApplication {
         sceneContext.getSceneController().loadScene();
         sceneContext.setSpeechSynthesiser(new SpeechSynthesiser());
 
-        sceneContext.getSpeechSynthesiser().say("en_gb", "Welcome, wanderer of the physical realms.");
-
+        sceneContext.setAide(new Aide(sceneContext));
 
         final org.bubblecloud.vr4java.ui.Character character = sceneContext.getSceneController().setupCharacter();
         sceneContext.setCharacter(character);
