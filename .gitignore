@@ -18,6 +18,7 @@ certificate-*
 *.jks
 *.log*
 assets/
+sounds/
 asset-cache/
 repo/
 lib/

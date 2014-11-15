@@ -22,6 +22,7 @@ public class SceneContext {
     private SteeringController steeringController;
     private SceneController sceneController;
     private EditController editController;
+    private SpeechSynthesiser speechSynthesiser;
 
     private AudioRecordController audioRecordController;
     private AudioPlaybackController audioPlaybackController;
@@ -106,6 +107,14 @@ public class SceneContext {
 
     public void setRootNode(Node rootNode) {
         this.rootNode = rootNode;
+    }
+
+    public SpeechSynthesiser getSpeechSynthesiser() {
+        return speechSynthesiser;
+    }
+
+    public void setSpeechSynthesiser(SpeechSynthesiser speechSynthesiser) {
+        this.speechSynthesiser = speechSynthesiser;
     }
 
     public AudioRecordController getAudioRecordController() {

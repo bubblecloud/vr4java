@@ -192,6 +192,12 @@
             <version>${jmonkey.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>javazoom</groupId>
+            <artifactId>jlayer</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
         <!--<dependency>
             <groupId>com.jme3</groupId>
             <artifactId>jme3-terrain</artifactId>
