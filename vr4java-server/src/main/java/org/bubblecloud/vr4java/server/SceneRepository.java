@@ -112,26 +112,19 @@ public class SceneRepository {
     }
 
     public void saveNodes(final UUID sceneId, final List<SceneNode> sceneNodes) {
-        int persistentNodeCount = 0;
-        for (final SceneNode sceneNode : sceneNodes) {
-            if (sceneNode.isPersistent()) {
-                persistentNodeCount++;
-            }
-        }
-
-        if (persistentNodeCount == 0) {
-            return;
-        }
 
         final Scene scene = SceneDao.getScene(serverContext.getEntityManager(), sceneId);
         if (scene == null) {
             LOGGER.warn("Scene not found in repository: " + sceneId);
         }
 
+        int persistentNodeCount = 0;
         final List<SceneNode> nodesToAdd = new ArrayList<SceneNode>();
         final List<SceneNode> nodesToUpdate = new ArrayList<SceneNode>();
         for (final SceneNode sceneNode : sceneNodes) {
+
             if (serverContext.getUser() != null) {
+                // Allow update only if user is owner of the object or has administrative rights.
                 if (!serverContext.getUserCertificateFingerprint().equals(sceneNode.getOwnerCertificateFingerprint()
                     ) && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
                         serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
@@ -141,6 +134,10 @@ public class SceneRepository {
                             + " tried to save not owned object and was not administrator nor" +
                             " had administrator privileges on the scene: " + sceneNode.getId());
                 }
+            }
+
+            if (sceneNode.isPersistent()) {
+                persistentNodeCount++;
             }
 
             if (sceneNode.isPersistent()) {
@@ -161,6 +158,12 @@ public class SceneRepository {
             }
         }
 
+        // The following is carried out only if saving one or more persistent nodes.
+        if (persistentNodeCount == 0) {
+            return;
+        }
+
+        // Allow only if user is administrator or has administrative rights to the scene.
         if (serverContext.getUser() != null && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
                 serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
                 PRIVILEGE_ADMINISTRATE, sceneId.toString())
@@ -189,18 +192,36 @@ public class SceneRepository {
             if (sceneNode == null) {
                 continue;
             }
+
+            if (serverContext.getUser() != null) {
+                // Allow update only if user is owner of the object or has administrative rights.
+                if (!serverContext.getUserCertificateFingerprint().equals(sceneNode.getOwnerCertificateFingerprint()
+                ) && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
+                        serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
+                        PRIVILEGE_ADMINISTRATE, sceneId.toString())
+                        && !serverContext.getRoles().contains("administrator")) {
+                    throw new SecurityException("User: " + serverContext.getUser()
+                            + " tried to save not owned object and was not administrator nor" +
+                            " had administrator privileges on the scene: " + sceneNode.getId());
+                }
+            }
+
             sceneNodesToRemove.add(sceneNode);
         }
 
-        if (sceneNodesToRemove.size() > 0) {
-            if (serverContext.getUser() != null && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
-                    serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
-                    PRIVILEGE_ADMINISTRATE, sceneId.toString())
-                    && !serverContext.getRoles().contains("administrator")) {
-                throw new SecurityException("User " + serverContext.getUser().getUserId() + " node save denied to scene: " + sceneId);
-            }
-            SceneNodeDao.removeSceneNodes(serverContext.getEntityManager(), sceneNodesToRemove);
+        // The following is carried out only if removing one or more persistent nodes.
+        if (sceneNodesToRemove.size() == 0) {
+            return;
         }
+
+        if (serverContext.getUser() != null && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
+                serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
+                PRIVILEGE_ADMINISTRATE, sceneId.toString())
+                && !serverContext.getRoles().contains("administrator")) {
+            throw new SecurityException("User " + serverContext.getUser().getUserId() + " node save denied to scene: " + sceneId);
+        }
+        SceneNodeDao.removeSceneNodes(serverContext.getEntityManager(), sceneNodesToRemove);
+
     }
 
 

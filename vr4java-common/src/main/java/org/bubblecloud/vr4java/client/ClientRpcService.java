@@ -94,7 +94,8 @@ public class ClientRpcService implements SceneService, MessageHandler {
 
     @Override
     public void setNodesDynamic(UUID sceneId, List<UUID> ids) {
-        sceneService.setNodesDynamic(sceneId, ids);
+        //sceneService.setNodesDynamic(sceneId, ids);
+        throw new UnsupportedOperationException();
     }
 
     @Override

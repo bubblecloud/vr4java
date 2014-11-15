@@ -179,35 +179,35 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
     }
 
     @Override
-    public void setSceneStateSlug(UUID sceneId, byte[] state) {
-        serverSceneService.setSceneStateSlug(sceneId, state);
-    }
-
-    @Override
     public void removeScene(UUID sceneId) {
         serverSceneService.removeScene(sceneId);
     }
 
     @Override
-    public void updateNodes(UUID sceneId, List<SceneNode> nodes) {
-        serverSceneService.updateNodes(sceneId, nodes);
+    public void addNodes(UUID sceneId, List<SceneNode> nodes) {
         sceneRepository.saveNodes(sceneId, nodes);
+        serverSceneService.addNodes(sceneId, nodes);
+        for (final ServerRpcService service : services) {
+            service.getClientService().addNodes(sceneId, nodes);
+        }
+    }
+
+    @Override
+    public void updateNodes(UUID sceneId, List<SceneNode> nodes) {
+        sceneRepository.saveNodes(sceneId, nodes);
+        serverSceneService.updateNodes(sceneId, nodes);
         for (final ServerRpcService service : services) {
             service.getClientService().updateNodes(sceneId, nodes);
         }
     }
 
     @Override
-    public void setNodesStatic(UUID sceneId, List<UUID> ids) {
-        serverSceneService.setNodesStatic(sceneId, ids);
+    public void removeNodes(UUID sceneId, List<UUID> ids) {
+        sceneRepository.removeNodes(sceneId, ids);
+        serverSceneService.removeNodes(sceneId, ids);
         for (final ServerRpcService service : services) {
-            service.getClientService().setNodesStatic(sceneId, ids);
+            service.getClientService().removeNodes(sceneId, ids);
         }
-    }
-
-    @Override
-    public Scene getScene(UUID sceneId) {
-        return serverSceneService.getScene(sceneId);
     }
 
     @Override
@@ -229,27 +229,21 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
     }
 
     @Override
-    public void removeNodes(UUID sceneId, List<UUID> ids) {
-        serverSceneService.removeNodes(sceneId, ids);
-        sceneRepository.removeNodes(sceneId, ids);
+    public void setNodesStatic(UUID sceneId, List<UUID> ids) {
+        serverSceneService.setNodesStatic(sceneId, ids);
         for (final ServerRpcService service : services) {
-            service.getClientService().removeNodes(sceneId, ids);
+            service.getClientService().setNodesStatic(sceneId, ids);
         }
     }
 
     @Override
-    public void addNodes(UUID sceneId, List<SceneNode> nodes) {
-        for (final SceneNode node : nodes) {
-            if (!remoteFingerprint.equals(node.getOwnerCertificateFingerprint())) {
-                LOGGER.warn("Attempt to add nodes without proper owner certificate fingerprint.");
-                return;
-            }
-        }
-        sceneRepository.saveNodes(sceneId, nodes);
-        serverSceneService.addNodes(sceneId, nodes);
-        for (final ServerRpcService service : services) {
-            service.getClientService().addNodes(sceneId, nodes);
-        }
+    public void setSceneStateSlug(UUID sceneId, byte[] state) {
+        serverSceneService.setSceneStateSlug(sceneId, state);
+    }
+
+    @Override
+    public Scene getScene(UUID sceneId) {
+        return serverSceneService.getScene(sceneId);
     }
 
     @Override
