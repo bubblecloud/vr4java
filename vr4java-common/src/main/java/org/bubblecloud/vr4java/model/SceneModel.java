@@ -139,7 +139,9 @@ public class SceneModel {
         for (int i = 0; i < nodes.size(); i++) {
             final int startIndex = i * SceneNode.NODE_STATE_LENGTH;
             final SceneNode node = nodes.get(i);
-            node.writeState(bytes, startIndex);
+            if (node != null) {
+                node.writeState(bytes, startIndex);
+            }
         }
         return bytes;
     }

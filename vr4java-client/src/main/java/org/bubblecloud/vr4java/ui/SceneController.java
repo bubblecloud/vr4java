@@ -268,11 +268,13 @@ public class SceneController implements SceneServiceListener {
             final Spatial spatial = spatials.get(nodeId);
             if (spatial != null) {
                 rootNode.detachChild(spatial);
+                if (spatial.getControl(RigidBodyControl.class) != null) {
+                    physicsSpace.remove(spatial);
+                }
             }
             if (animationControllers.containsKey(nodeId)) {
                 animationControllers.remove(nodeId);
             }
-            physicsSpace.remove(spatial);
             spatials.remove(nodeId);
         }
     }
