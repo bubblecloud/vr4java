@@ -23,7 +23,6 @@ import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.io.IOException;
 import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -212,6 +211,7 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
 
     @Override
     public void setNodesDynamic(UUID sceneId, List<UUID> ids) {
+        sceneRepository.privilegeCheckDynamicStateChange(sceneId, ids);
         serverSceneService.setNodesDynamic(sceneId, ids);
         final List<SceneNode> nodes = serverSceneService.getNodes(sceneId, ids);
         final List<Integer> indexes = new ArrayList<Integer>();
@@ -230,6 +230,7 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
 
     @Override
     public void setNodesStatic(UUID sceneId, List<UUID> ids) {
+        sceneRepository.privilegeCheckDynamicStateChange(sceneId, ids);
         serverSceneService.setNodesStatic(sceneId, ids);
         for (final ServerRpcService service : services) {
             service.getClientService().setNodesStatic(sceneId, ids);
@@ -238,6 +239,9 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
 
     @Override
     public void setSceneStateSlug(UUID sceneId, byte[] state) {
+        final Map<UUID, String> nodeIdsAndOwnerFingerprints =
+                serverSceneService.getStateSlugNodeIdAndOwnerFingerprint(sceneId, state);
+        sceneRepository.privilegeCheckUpdate(sceneId, nodeIdsAndOwnerFingerprints);
         serverSceneService.setSceneStateSlug(sceneId, state);
     }
 
@@ -356,5 +360,10 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
                 LOGGER.warn("Error sending state slug to client: " + service.getRemoteFingerprint());
             }
         }
+    }
+
+    @Override
+    public Map<UUID, String> getStateSlugNodeIdAndOwnerFingerprint(UUID sceneId, byte[] state) {
+        throw new UnsupportedOperationException();
     }
 }

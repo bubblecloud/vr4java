@@ -14,10 +14,7 @@ import org.vaadin.addons.sitekit.model.Company;
 import org.vaadin.addons.sitekit.model.Group;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by tlaukkan on 10/31/2014.
@@ -224,6 +221,43 @@ public class SceneRepository {
 
     }
 
+    public void privilegeCheckDynamicStateChange(final UUID sceneId, final List<UUID> nodeIds) {
+             for (final UUID sceneNodeId : nodeIds) {
+                final SceneNode sceneNode = SceneNodeDao.getSceneNode(serverContext.getEntityManager(), sceneNodeId);
+                if (sceneNode == null) {
+                    continue;
+                }
+
+            final String ownerFingerprint = sceneNode.getOwnerCertificateFingerprint();
+            // Allow update only if user is owner of the object or has administrative rights.
+            if (!serverContext.getUserCertificateFingerprint().equals(ownerFingerprint
+            ) && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
+                    serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
+                    PRIVILEGE_ADMINISTRATE, sceneId.toString())
+                    && !serverContext.getRoles().contains("administrator")) {
+                throw new SecurityException("User: " + serverContext.getUser()
+                        + " tried to save not owned object and was not administrator nor" +
+                        " had administrator privileges on the scene: " + sceneNodeId);
+            }
+        }
+    }
+
+
+    public void privilegeCheckUpdate(final UUID sceneId, final Map<UUID, String> nodeIdsAndOwnerFingerprints) {
+        for (final UUID sceneNodeId : nodeIdsAndOwnerFingerprints.keySet()) {
+            final String ownerFingerprint = nodeIdsAndOwnerFingerprints.get(sceneNodeId);
+            // Allow update only if user is owner of the object or has administrative rights.
+            if (!serverContext.getUserCertificateFingerprint().equals(ownerFingerprint
+            ) && !PrivilegeCache.hasPrivilege(serverContext.getEntityManager(),
+                    serverContext.getCompany(), serverContext.getUser(), serverContext.getGroups(),
+                    PRIVILEGE_ADMINISTRATE, sceneId.toString())
+                    && !serverContext.getRoles().contains("administrator")) {
+                throw new SecurityException("User: " + serverContext.getUser()
+                        + " tried to save not owned object and was not administrator nor" +
+                        " had administrator privileges on the scene: " + sceneNodeId);
+            }
+        }
+    }
 
     public List<SceneNode> loadNodes(final Scene scene) {
         return SceneNodeDao.getSceneNodes(serverContext.getEntityManager(), scene);

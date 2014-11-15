@@ -11,6 +11,7 @@ import org.bubblecloud.vr4java.rpc.MessageHandler;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -60,6 +61,11 @@ public class ClientRpcService implements SceneService, MessageHandler {
     @Override
     public void removeScene(UUID sceneId) {
         sceneService.removeScene(sceneId);
+    }
+
+    @Override
+    public Map<UUID, String> getStateSlugNodeIdAndOwnerFingerprint(UUID sceneId, byte[] state) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

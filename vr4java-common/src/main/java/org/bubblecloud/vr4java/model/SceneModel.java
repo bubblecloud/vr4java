@@ -144,7 +144,6 @@ public class SceneModel {
         return bytes;
     }
 
-
     public List<UUID> setStateSlug(final byte[] state) {
         final List<UUID> nodeIds = new ArrayList<>();
         for (int i = 0; i < state.length / SceneNode.NODE_STATE_LENGTH; i++) {
@@ -172,4 +171,29 @@ public class SceneModel {
         return nodeIds;
     }
 
+    public Map<UUID, String> getStateSlugNodeIdAndOwnerFingerprint(final byte[] state) {
+        final HashMap<UUID, String> nodeIdsAndOwnerFingerprints = new HashMap<UUID, String>();
+        for (int i = 0; i < state.length / SceneNode.NODE_STATE_LENGTH; i++) {
+            int startIndex = i * SceneNode.NODE_STATE_LENGTH;
+            int nodeIndex = BytesUtil.readShort(state, startIndex);
+            if (nodeIndex == 0) {
+                break;
+            }
+            if (nodeIndex == -1) {
+                continue;
+            }
+            final short idHash = BytesUtil.readShort(state, startIndex + 2);
+            final SceneNode node = dynamicNodeTable[nodeIndex];
+            if (node == null) {
+                LOGGER.warn("No node in dynamic node list at index: " + nodeIndex);
+                continue;
+            }
+            if (((short) node.getId().hashCode()) != idHash) {
+                LOGGER.warn("Node id hash in dynamic node list did not match that of state for node ID: " + node.getId());
+                continue;
+            }
+            nodeIdsAndOwnerFingerprints.put(node.getId(), node.getOwnerCertificateFingerprint());
+        }
+        return nodeIdsAndOwnerFingerprints;
+    }
 }

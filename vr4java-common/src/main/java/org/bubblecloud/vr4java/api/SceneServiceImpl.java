@@ -298,4 +298,14 @@ public class SceneServiceImpl implements SceneService {
             }
         }
     }
+
+    @Override
+    public Map<UUID, String> getStateSlugNodeIdAndOwnerFingerprint(UUID sceneId, final byte[] state) {
+        final Scene scene = scenes.get(sceneId);
+        if (scene == null) {
+            LOGGER.warn("Scene does not exist: " + sceneId);
+            throw new IllegalArgumentException("Scene does not exist: " + sceneId);
+        }
+        return models.get(sceneId).getStateSlugNodeIdAndOwnerFingerprint(state);
+    }
 }

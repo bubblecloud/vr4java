@@ -7,6 +7,7 @@ import org.bubblecloud.vr4java.rpc.RpcMethod;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -27,6 +28,8 @@ public interface SceneService {
     public void addScene(final Scene scene, final Collection<SceneNode> nodes);
 
     public void removeScene(final UUID sceneId);
+
+    Map<UUID, String> getStateSlugNodeIdAndOwnerFingerprint(UUID sceneId, byte[] state);
 
     @RpcMethod
     public Collection<Scene> getScenes();
