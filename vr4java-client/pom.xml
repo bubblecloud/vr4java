@@ -179,12 +179,12 @@
             <artifactId>jme3-networking</artifactId>
             <version>${jmonkey.version}</version>
         </dependency>
-
+-->
         <dependency>
             <groupId>com.jme3</groupId>
             <artifactId>jme3-niftygui</artifactId>
             <version>${jmonkey.version}</version>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>com.jme3</groupId>
@@ -196,6 +196,12 @@
             <groupId>javazoom</groupId>
             <artifactId>jlayer</artifactId>
             <version>1.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bushe</groupId>
+            <artifactId>eventbus</artifactId>
+            <version>1.4</version>
         </dependency>
 
         <!--<dependency>

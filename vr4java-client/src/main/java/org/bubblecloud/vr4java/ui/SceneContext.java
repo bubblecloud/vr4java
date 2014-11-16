@@ -5,6 +5,7 @@ import com.jme3.bullet.PhysicsSpace;
 import com.jme3.input.InputManager;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import org.bubblecloud.vr4java.VrClient;
 import org.bubblecloud.vr4java.client.ClientNetwork;
 
 /**
@@ -12,6 +13,7 @@ import org.bubblecloud.vr4java.client.ClientNetwork;
  */
 public class SceneContext {
 
+    private VrClient vrClient;
     private InputManager inputManager;
     private AssetManager assetManager;
     private Camera camera;
@@ -24,9 +26,18 @@ public class SceneContext {
     private EditController editController;
     private SpeechSynthesiser speechSynthesiser;
     private Aide aide;
+    private HudController hudController;
 
     private AudioRecordController audioRecordController;
     private AudioPlaybackController audioPlaybackController;
+
+    public VrClient getVrClient() {
+        return vrClient;
+    }
+
+    public void setVrClient(VrClient vrClient) {
+        this.vrClient = vrClient;
+    }
 
     private Character character;
 
@@ -140,5 +151,13 @@ public class SceneContext {
 
     public void setAide(Aide aide) {
         this.aide = aide;
+    }
+
+    public HudController getHudController() {
+        return hudController;
+    }
+
+    public void setHudController(HudController hudController) {
+        this.hudController = hudController;
     }
 }

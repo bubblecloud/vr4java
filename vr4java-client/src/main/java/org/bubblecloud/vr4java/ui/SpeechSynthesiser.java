@@ -1,5 +1,6 @@
 package org.bubblecloud.vr4java.ui;
 
+import com.jme3.scene.Spatial;
 import javazoom.jl.player.Player;
 import org.apache.commons.io.IOUtils;
 import org.bubblecloud.vr4java.util.GoogleSpeechService;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.lang.Character;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 /**
  * The shield maiden main class.
@@ -23,21 +25,23 @@ public class SpeechSynthesiser {
     /** The logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SpeechSynthesiser.class);
 
-    public SpeechSynthesiser() {
+    private SceneContext sceneContext;
 
+    public SpeechSynthesiser(final SceneContext sceneContext) {
+        this.sceneContext = sceneContext;
     }
 
 
-    public void say(final String language, final String sentence) {
+    public void say(final String language, final String sentence, final String speechId, final SpeechSynthesiserCallback speechCallback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                saySynchronous(sentence, language);
+                saySynchronous(sentence, language, speechId, speechCallback);
             }
         }).start();
     }
 
-    public void saySynchronous(String sentence, String language) {
+    public void saySynchronous(String sentence, String language, final String speechId, final SpeechSynthesiserCallback speechCallback) {
         final String sayFilePath = PropertiesUtil.getProperty("vr4java-client", "sound-cache-path");
 
         final File sayFileDirectory = new File(sayFilePath);
@@ -84,10 +88,21 @@ public class SpeechSynthesiser {
             player.play();
             player.close();
             inputStream.close();
+
+            sceneContext.getVrClient().enqueue(new Callable<Object>() {
+                public Object call() throws Exception {
+                    speechCallback.onSpeechSpoken(speechId);
+                    return null;
+                }
+            });
             return;
         } catch (final Exception e) {
             LOGGER.error("Playing utterance file failed: ", e);
             return;
         }
+    }
+
+    public static interface SpeechSynthesiserCallback {
+        void onSpeechSpoken(final String speechId);
     }
 }

@@ -6,14 +6,17 @@ import com.jme3.app.state.AppState;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.math.*;
+import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.AppSettings;
+import de.lessvoid.nifty.Nifty;
 import org.apache.log4j.Logger;
 import org.bubblecloud.vr4java.client.ClientNetwork;
 import org.bubblecloud.vr4java.client.ClientNetworkStartupListener;
 import org.bubblecloud.vr4java.ui.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 
@@ -119,6 +122,7 @@ public class VrClient extends SimpleApplication {
         assetManager.registerLocator("assets", FileLocator.class);
 
         sceneContext = new SceneContext();
+        sceneContext.setVrClient(this);
         sceneContext.setAudioRecordController(new AudioRecordController(sceneContext));
         sceneContext.setAudioPlaybackController(new AudioPlaybackController(sceneContext));
         sceneContext.setClientNetwork(clientNetwork);
@@ -133,9 +137,18 @@ public class VrClient extends SimpleApplication {
         sceneContext.setSceneController(new SceneController(sceneContext));
         sceneContext.setEditController(new EditController(sceneContext));
         sceneContext.getSceneController().loadScene();
-        sceneContext.setSpeechSynthesiser(new SpeechSynthesiser());
+        sceneContext.setSpeechSynthesiser(new SpeechSynthesiser(sceneContext));
 
         sceneContext.setAide(new Aide(sceneContext));
+
+        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager,
+                inputManager,
+                audioRenderer,
+                guiViewPort);
+        sceneContext.setHudController(new HudController(sceneContext, niftyDisplay));
+
+        guiViewPort.addProcessor(niftyDisplay);
+
 
         final org.bubblecloud.vr4java.ui.Character character = sceneContext.getSceneController().setupCharacter();
         sceneContext.setCharacter(character);
@@ -148,10 +161,21 @@ public class VrClient extends SimpleApplication {
         sceneContext.getEditController().update(tpf);
         sceneContext.getSceneController().update(tpf);
         sceneContext.getCharacter().getCharacterAnimator().update(tpf);
+        sceneContext.getAide().update(tpf);
     }
 
     @Override
     public void simpleRender(final RenderManager renderManager) {
     }
 
+    public void restart() {
+        try {
+            Runtime.getRuntime().exec("java -jar installer.jar");
+        } catch (IOException e) {
+            LOGGER.error("Error running installer on restart:", e);
+            return;
+        }
+        stop();
+        return;
+    }
 }
