@@ -1,11 +1,7 @@
 package org.bubblecloud.vr4java.ui;
 
 import org.apache.log4j.Logger;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
+import org.bubblecloud.vr4java.util.VrClientProperties;
 
 /**
  * Created by tlaukkan on 11/15/2014.
@@ -40,15 +36,9 @@ public class Aide implements HudController.HudInputCallback, SpeechSynthesiser.S
     @Override
     public void onInput(final String inputId, final  String inputValue) {
         if (inputId.equals(INPUT_USERNAME)) {
+            final String userNamePropertyKey = "user-name";
             final String userName = inputValue.split(" ")[0];
-            final Properties properties = new Properties();
-            try {
-                properties.load(new FileInputStream("vr4java-client-ext.properties"));
-                properties.put("user-name", inputValue);
-                properties.store(new FileOutputStream("vr4java-client-ext.properties"), null);
-            } catch (IOException e) {
-                LOGGER.error("Error setting user name to properties.", e);
-            }
+            VrClientProperties.save(userNamePropertyKey, inputValue);
             sceneContext.getSpeechSynthesiser().say("en_gb", "Hi, " + userName + ". Stand by for reconnect with your new identity! 3 2 1 bye", SPEECH_RECONNECT_WITH_NEW_IDENTITY, this);
         }
     }
