@@ -244,6 +244,8 @@ public class SceneController implements SceneServiceListener {
                 final Spatial spatial = newModel((ModelNode) node);
                 rootNode.attachChild(spatial);
                 spatials.put(node.getId(), spatial);
+
+                sceneContext.getAide().onRemoteCharacterLoaded(node.getName());
             }
         }
     }
@@ -418,7 +420,7 @@ public class SceneController implements SceneServiceListener {
     }
 
     public Character setupCharacter() {
-        final String name = "Character";
+        final String name = sceneContext.getClientNetwork().getUserName();
         final String modelName = PropertiesUtil.getProperty("vr4java-client", "character-model");
 
         final Spatial characterModel = assetManager.loadModel(modelName);

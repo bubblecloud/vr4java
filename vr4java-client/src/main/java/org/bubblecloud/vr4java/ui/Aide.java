@@ -1,6 +1,7 @@
 package org.bubblecloud.vr4java.ui;
 
 import org.apache.log4j.Logger;
+import org.bubblecloud.vr4java.util.Genderize;
 import org.bubblecloud.vr4java.util.VrClientProperties;
 
 /**
@@ -13,6 +14,7 @@ public class Aide implements HudController.HudInputCallback, SpeechSynthesiser.S
     public static final String SPEECH_REQUEST_USERNAME = "speech_request_username";
     public static final String SPEECH_WELCOME = "speech_welcome";
     public static final String SPEECH_RECONNECT_WITH_NEW_IDENTITY = "speech_reconnect_with_new_identity";
+    public static final String SPEECH_REMOTE_CONNECT = "speech_remote_connect";
     private SceneContext sceneContext;
 
     public Aide(final SceneContext sceneContext) {
@@ -28,6 +30,10 @@ public class Aide implements HudController.HudInputCallback, SpeechSynthesiser.S
         }
     }
 
+    public void onRemoteCharacterLoaded(final String name) {
+        sceneContext.getSpeechSynthesiser().say("en_gb", name + " connected.", SPEECH_REMOTE_CONNECT, this);
+    }
+
     public void update(float tpf) {
 
     }
@@ -35,9 +41,14 @@ public class Aide implements HudController.HudInputCallback, SpeechSynthesiser.S
     @Override
     public void onInput(final String inputId, final  String inputValue) {
         if (inputId.equals(INPUT_USERNAME)) {
-            final String userNamePropertyKey = "user-name";
             final String userName = inputValue.split(" ")[0];
-            VrClientProperties.save(userNamePropertyKey, inputValue);
+            final boolean male = Genderize.isMale(userName);
+            VrClientProperties.save("user-name", inputValue);
+            if (male) {
+                VrClientProperties.save("character-model", "jme3-open-asset-pack-v1/character/human/male/ogre/male.scene");
+            } else {
+                VrClientProperties.save("character-model", "jme3-open-asset-pack-v1/character/human/female/ogre/female.scene");
+            }
             sceneContext.getSpeechSynthesiser().say("en_gb", "Hi, " + userName + ". Stand by for reconnect with your new identity! 3 2 1 bye", SPEECH_RECONNECT_WITH_NEW_IDENTITY, this);
         }
     }
