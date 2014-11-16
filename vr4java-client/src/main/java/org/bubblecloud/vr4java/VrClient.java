@@ -130,6 +130,7 @@ public class VrClient extends SimpleApplication {
         sceneContext.setAssetManager(assetManager);
         sceneContext.setCamera(cam);
         sceneContext.setRootNode(rootNode);
+        sceneContext.setGuiNode(guiNode);
         sceneContext.setPhysicsSpace(physicsState.getPhysicsSpace());
 
         sceneContext.setSteeringController(new SteeringController(sceneContext));

@@ -19,6 +19,7 @@ public class SceneContext {
     private Camera camera;
     private PhysicsSpace physicsSpace;
     private Node rootNode;
+    private Node guiNode;
 
     private ClientNetwork clientNetwork;
     private SteeringController steeringController;
@@ -119,6 +120,14 @@ public class SceneContext {
 
     public void setRootNode(Node rootNode) {
         this.rootNode = rootNode;
+    }
+
+    public Node getGuiNode() {
+        return guiNode;
+    }
+
+    public void setGuiNode(Node guiNode) {
+        this.guiNode = guiNode;
     }
 
     public SpeechSynthesiser getSpeechSynthesiser() {

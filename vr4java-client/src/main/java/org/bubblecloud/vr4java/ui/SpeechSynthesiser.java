@@ -41,7 +41,7 @@ public class SpeechSynthesiser {
         }).start();
     }
 
-    public void saySynchronous(String sentence, String language, final String speechId, final SpeechSynthesiserCallback speechCallback) {
+    public synchronized void saySynchronous(String sentence, String language, final String speechId, final SpeechSynthesiserCallback speechCallback) {
         final String sayFilePath = PropertiesUtil.getProperty("vr4java-client", "sound-cache-path");
 
         final File sayFileDirectory = new File(sayFilePath);
