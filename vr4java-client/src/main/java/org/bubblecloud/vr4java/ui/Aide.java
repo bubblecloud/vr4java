@@ -23,7 +23,6 @@ public class Aide implements HudController.HudInputCallback, SpeechSynthesiser.S
         final String userName = sceneContext.getClientNetwork().getUserName().split(" ")[0];
         if (userName.equals("Anonymous")) {
             sceneContext.getSpeechSynthesiser().say("en_gb", "Welcome! I am your aide process. Please tell me your name.", SPEECH_REQUEST_USERNAME, this);
-            sceneContext.getHudController().askUserInput(INPUT_USERNAME, "Your username:", this);
         } else {
             sceneContext.getSpeechSynthesiser().say("en_gb", "Hi, " + userName, SPEECH_WELCOME, this);
         }
@@ -45,7 +44,9 @@ public class Aide implements HudController.HudInputCallback, SpeechSynthesiser.S
 
     @Override
     public void onSpeechSpoken(String speechId) {
-        if (speechId.equals(SPEECH_RECONNECT_WITH_NEW_IDENTITY)) {
+        if (speechId.equals(SPEECH_REQUEST_USERNAME)) {
+            sceneContext.getHudController().askUserInput(INPUT_USERNAME, "Your username:", this);
+        } else if (speechId.equals(SPEECH_RECONNECT_WITH_NEW_IDENTITY)) {
             sceneContext.getVrClient().restart();
         }
     }
