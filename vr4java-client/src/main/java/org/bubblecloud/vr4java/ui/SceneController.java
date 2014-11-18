@@ -4,15 +4,20 @@ import com.jme3.asset.AssetManager;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
+import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapText;
+import com.jme3.font.Rectangle;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.MatParam;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.BillboardControl;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.scene.shape.Torus;
@@ -394,6 +399,25 @@ public class SceneController implements SceneServiceListener {
         final Spatial spatial = assetManager.loadModel(node.getModel());
         updateSpatialTransformation(node, spatial);
         animationControllers.put(node.getId(), new AnimationController(spatial));
+
+        final BitmapFont bitmapFont = assetManager.loadFont("Interface/Fonts/Console.fnt");
+
+        final BitmapText bitmapText = new BitmapText(bitmapFont, false);
+        bitmapText.setColor(new ColorRGBA(0.6f, 0.6f, 0.6f, 0.6f));
+        bitmapText.setSize(0.2f);
+        bitmapText.setText(node.getName());
+        bitmapText.updateLogicalState(0f);
+        bitmapText.setBox(new Rectangle(-bitmapText.getLineWidth() / 2f, bitmapText.getLineHeight(), bitmapText.getLineWidth(), bitmapText.getLineHeight()));
+        bitmapText.setQueueBucket(RenderQueue.Bucket.Transparent);
+        bitmapText.setAlignment(BitmapFont.Align.Center);
+        bitmapText.setLocalTranslation(0, 2f, 0);
+
+        final BillboardControl billboardControl = new BillboardControl();
+        billboardControl.setAlignment(BillboardControl.Alignment.Screen);
+        bitmapText.addControl(billboardControl);
+
+        ((Node) spatial).attachChild(bitmapText);
+
         return spatial;
     }
 

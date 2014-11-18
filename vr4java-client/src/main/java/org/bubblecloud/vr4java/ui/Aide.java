@@ -33,6 +33,11 @@ public class Aide implements HudController.HudInputCallback, SpeechSynthesiser.S
             sceneContext.getSpeechSynthesiser().say("en_gb", "Welcome! I am your aide process. Please tell me your name.", SPEECH_REQUEST_USERNAME, this);
         } else {
             sceneContext.getSpeechSynthesiser().say("en_gb", "Hi, " + userName, SPEECH_WELCOME, this);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             if (remoteCharacters.size() > 0) {
                 reportRemoteCharacters();
             }
