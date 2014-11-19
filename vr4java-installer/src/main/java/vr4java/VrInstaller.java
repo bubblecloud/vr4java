@@ -29,6 +29,7 @@ import org.eclipse.aether.version.Version;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -62,13 +63,13 @@ public class VrInstaller {
         session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepository ) );
         session.setTransferListener( new ConsoleTransferListener() );
         session.setRepositoryListener( new ConsoleRepositoryListener(vrSplash, System.out) );
-        download("installer.jar","installer-new.jar", "org.bubblecloud.vr4java", "vr4java-installer", remoteRepositories, system, session);
-        download("client.jar", "client.jar", "org.bubblecloud.vr4java", "vr4java-client", remoteRepositories, system, session);
+        download("installer.jar","installer-new.jar", "org.bubblecloud.vr4java", "vr4java-installer", false, remoteRepositories, system, session);
+        download("client.jar", "client.jar", "org.bubblecloud.vr4java", "vr4java-client", true, remoteRepositories, system, session);
 
         Runtime.getRuntime().exec("java -jar client.jar");
     }
 
-    private static void download(final String oldFile, final String newFile, String groupId, String artifactId, List<RemoteRepository> remoteRepositories, RepositorySystem system, DefaultRepositorySystemSession session) throws VersionRangeResolutionException, DependencyResolutionException, IOException {
+    private static void download(final String oldFile, final String newFile, String groupId, String artifactId, boolean dependencies, List<RemoteRepository> remoteRepositories, RepositorySystem system, DefaultRepositorySystemSession session) throws VersionRangeResolutionException, DependencyResolutionException, IOException, ArtifactResolutionException {
         final Artifact artifactVersionRange = new DefaultArtifact(groupId + ":" + artifactId + ":[0,)");
 
         final VersionRangeRequest rangeRequest = new VersionRangeRequest();
@@ -88,15 +89,19 @@ public class VrInstaller {
         final Artifact artifact = new DefaultArtifact(artifactFullId);
 
         final DependencyFilter classpathFilter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
-        CollectRequest collectRequest = new CollectRequest();
-        collectRequest.setRoot( new Dependency( artifact, JavaScopes.COMPILE ) );
-        collectRequest.setRepositories(remoteRepositories);
-        final DependencyRequest dependencyRequest = new DependencyRequest( collectRequest, classpathFilter );
 
-        session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
-        final List<ArtifactResult> artifactResults =
-                system.resolveDependencies( session, dependencyRequest ).getArtifactResults();
-
+        final List<ArtifactResult> artifactResults;
+        if (dependencies) {
+            CollectRequest collectRequest = new CollectRequest();
+            collectRequest.setRoot( new Dependency( artifact, JavaScopes.COMPILE ) );
+            collectRequest.setRepositories(remoteRepositories);
+            final DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFilter);
+            session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
+            artifactResults = system.resolveDependencies(session, dependencyRequest).getArtifactResults();
+        } else {
+            final ArtifactRequest artifactRequest = new ArtifactRequest(artifact, remoteRepositories, null);
+            artifactResults = Collections.singletonList(system.resolveArtifact(session, artifactRequest));
+        }
         File mainArtifactFile = null;
         for ( ArtifactResult artifactResult : artifactResults )
         {
@@ -113,9 +118,6 @@ public class VrInstaller {
                 destinationOldFile = new File("lib/" + repositoryFile.getName());
                 destinationNewFile = new File("lib/" + repositoryFile.getName());
             }
-
-            //System.out.println(artifactResult.getArtifact() + " resolved to " + destinationFile + "(" + repositoryFile + ")");
-
             if (!destinationOldFile.exists() || destinationOldFile.lastModified() != repositoryFile.lastModified() ||
                     destinationOldFile.length() != repositoryFile.length()) {
                 FileUtils.copyFile(repositoryFile, destinationNewFile);
