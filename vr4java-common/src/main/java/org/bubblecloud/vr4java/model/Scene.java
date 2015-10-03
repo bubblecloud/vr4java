@@ -1,7 +1,7 @@
 package org.bubblecloud.vr4java.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.vaadin.addons.sitekit.model.Company;
+import org.bubblecloud.ilves.model.Company;
 
 import javax.persistence.*;
 import java.util.Date;

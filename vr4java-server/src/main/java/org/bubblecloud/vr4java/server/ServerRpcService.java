@@ -1,6 +1,17 @@
 package org.bubblecloud.vr4java.server;
 
 import org.apache.log4j.Logger;
+import org.bubblecloud.ilves.cache.UserClientCertificateCache;
+import org.bubblecloud.ilves.model.Company;
+import org.bubblecloud.ilves.model.Group;
+import org.bubblecloud.ilves.model.User;
+import org.bubblecloud.ilves.module.content.Asset;
+import org.bubblecloud.ilves.module.content.ContentDao;
+import org.bubblecloud.ilves.security.CompanyDao;
+import org.bubblecloud.ilves.security.SecurityService;
+import org.bubblecloud.ilves.security.UserDao;
+import org.bubblecloud.ilves.site.DefaultSiteUI;
+import org.bubblecloud.ilves.util.PropertiesUtil;
 import org.bubblecloud.vr4java.api.PackageService;
 import org.bubblecloud.vr4java.api.SceneService;
 import org.bubblecloud.vr4java.api.SceneServiceImpl;
@@ -10,16 +21,6 @@ import org.bubblecloud.vr4java.model.Scene;
 import org.bubblecloud.vr4java.rpc.MessageHandler;
 import org.bubblecloud.vr4java.rpc.RpcProxyUtil;
 import org.bubblecloud.vr4java.rpc.RpcWsServerEndpoint;
-import org.vaadin.addons.sitekit.cache.UserClientCertificateCache;
-import org.vaadin.addons.sitekit.dao.CompanyDao;
-import org.vaadin.addons.sitekit.dao.UserDao;
-import org.vaadin.addons.sitekit.model.Company;
-import org.vaadin.addons.sitekit.model.Group;
-import org.vaadin.addons.sitekit.model.User;
-import org.vaadin.addons.sitekit.module.content.dao.ContentDao;
-import org.vaadin.addons.sitekit.module.content.model.Asset;
-import org.vaadin.addons.sitekit.site.DefaultSiteUI;
-import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -311,12 +312,16 @@ public class ServerRpcService extends RpcWsServerEndpoint implements SceneServic
         user.setCreated(new Date());
         user.setModified(new Date());
 
+        final ServerContext systemContext = ServerContext.buildLocalServerContext(
+                PropertiesUtil.getProperty(ServerMain.PROPERTIES_CATEGORY,
+                "server-certificate-self-sign-host-name"));
+
         if (UserDao.getGroup(entityManager, company, "vruser") == null) {
-            UserDao.addGroup(entityManager, new Group(company, "vruser", "Default VR user group."));
+            SecurityService.addGroup(systemContext, new Group(company, "vruser", "Default VR user group."));
         }
 
-        UserDao.addUser(entityManager, user, UserDao.getGroup(entityManager, company, "user"));
-        UserDao.addGroupMember(entityManager, UserDao.getGroup(entityManager, company, "vruser"), user);
+        SecurityService.addUser(systemContext, user, UserDao.getGroup(entityManager, company, "user"));
+        SecurityService.addGroupMember(systemContext, UserDao.getGroup(entityManager, company, "vruser"), user);
 
         return user;
     }

@@ -16,8 +16,8 @@
 package org.bubblecloud.vr4java.dao;
 
 import org.apache.log4j.Logger;
+import org.bubblecloud.ilves.model.Company;
 import org.bubblecloud.vr4java.model.Scene;
-import org.vaadin.addons.sitekit.model.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;

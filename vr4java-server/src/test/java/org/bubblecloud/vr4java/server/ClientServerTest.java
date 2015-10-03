@@ -1,6 +1,8 @@
 package org.bubblecloud.vr4java.server;
 
 import org.apache.log4j.Logger;
+import org.bubblecloud.ilves.util.PropertiesUtil;
+import org.bubblecloud.ilves.util.TestUtil;
 import org.bubblecloud.vr4java.client.ClientNetwork;
 import org.junit.Assert;
 import org.bubblecloud.vr4java.api.SceneServiceListener;
@@ -10,8 +12,6 @@ import org.bubblecloud.vr4java.model.Scene;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.addons.sitekit.util.PropertiesUtil;
-import org.vaadin.addons.sitekit.util.TestUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;

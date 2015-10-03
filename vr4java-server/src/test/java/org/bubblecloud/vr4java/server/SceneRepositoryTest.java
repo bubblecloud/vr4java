@@ -1,15 +1,13 @@
 package org.bubblecloud.vr4java.server;
 
+import org.bubblecloud.ilves.model.Company;
+import org.bubblecloud.ilves.model.User;
+import org.bubblecloud.ilves.security.CompanyDao;
+import org.bubblecloud.ilves.security.UserDao;
+import org.bubblecloud.ilves.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.addons.sitekit.dao.CompanyDao;
-import org.vaadin.addons.sitekit.dao.UserDao;
-import org.vaadin.addons.sitekit.model.Company;
-import org.vaadin.addons.sitekit.model.User;
-import org.vaadin.addons.sitekit.util.PropertiesUtil;
-import org.vaadin.addons.sitekit.util.TestUtil;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.net.URI;

@@ -22,12 +22,12 @@ import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.scene.shape.Torus;
 import org.apache.log4j.Logger;
+import org.bubblecloud.ilves.util.PropertiesUtil;
 import org.bubblecloud.vr4java.api.SceneService;
 import org.bubblecloud.vr4java.api.SceneServiceListener;
 import org.bubblecloud.vr4java.client.ClientNetwork;
 import org.bubblecloud.vr4java.model.*;
 import org.bubblecloud.vr4java.util.C;
-import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import java.util.*;
 import java.util.List;

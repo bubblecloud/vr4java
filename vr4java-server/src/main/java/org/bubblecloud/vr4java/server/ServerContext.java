@@ -1,13 +1,13 @@
 package org.bubblecloud.vr4java.server;
 
-import org.vaadin.addons.sitekit.dao.CompanyDao;
-import org.vaadin.addons.sitekit.dao.UserDao;
-import org.vaadin.addons.sitekit.model.Company;
-import org.vaadin.addons.sitekit.model.Group;
-import org.vaadin.addons.sitekit.model.User;
-import org.vaadin.addons.sitekit.site.DefaultSiteUI;
-import org.vaadin.addons.sitekit.site.ProcessingContext;
-import org.vaadin.addons.sitekit.util.PropertiesUtil;
+import org.bubblecloud.ilves.model.Company;
+import org.bubblecloud.ilves.model.Group;
+import org.bubblecloud.ilves.model.User;
+import org.bubblecloud.ilves.security.CompanyDao;
+import org.bubblecloud.ilves.security.SecurityContext;
+import org.bubblecloud.ilves.security.UserDao;
+import org.bubblecloud.ilves.site.DefaultSiteUI;
+import org.bubblecloud.ilves.util.PropertiesUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by tlaukkan on 11/1/2014.
  */
-public class ServerContext extends ProcessingContext {
+public class ServerContext extends SecurityContext {
 
     private static final List<String> APPLICATION_ROLES = Arrays.asList("administrator", "vruser");
     private String serverCertificateFingerprint;

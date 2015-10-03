@@ -1,5 +1,8 @@
 package org.bubblecloud.vr4java.dao;
 
+import org.bubblecloud.ilves.model.Company;
+import org.bubblecloud.ilves.security.CompanyDao;
+import org.bubblecloud.ilves.util.TestUtil;
 import org.bubblecloud.vr4java.model.CuboidNode;
 import org.bubblecloud.vr4java.model.Scene;
 import org.bubblecloud.vr4java.model.SceneNode;
@@ -7,14 +10,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.addons.sitekit.dao.CompanyDao;
-import org.vaadin.addons.sitekit.dao.UserDao;
-import org.vaadin.addons.sitekit.model.Company;
-import org.vaadin.addons.sitekit.model.Group;
-import org.vaadin.addons.sitekit.model.PostalAddress;
-import org.vaadin.addons.sitekit.model.User;
-import org.vaadin.addons.sitekit.util.PersistenceUtil;
-import org.vaadin.addons.sitekit.util.TestUtil;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;

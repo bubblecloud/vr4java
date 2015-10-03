@@ -3,6 +3,7 @@ package org.bubblecloud.vr4java.client;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
+import org.bubblecloud.ilves.util.PropertiesUtil;
 import org.bubblecloud.vr4java.api.PackageService;
 import org.bubblecloud.vr4java.api.SceneService;
 import org.bubblecloud.vr4java.api.SceneServiceListener;
@@ -13,7 +14,6 @@ import org.bubblecloud.vr4java.rpc.RpcConstants;
 import org.bubblecloud.vr4java.rpc.RpcProxyUtil;
 import org.bubblecloud.vr4java.rpc.RpcWsClient;
 import org.bubblecloud.vr4java.util.ZipUtil;
-import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -78,7 +78,7 @@ public class ClientNetwork {
 
     public void start(final ClientNetworkStartupListener listener) throws Exception {
         if (listener != null) {
-            listener.message("Connecting...");
+            listener.message("Connecting to " + rpcUrl);
         }
 
         client.start();

@@ -3,11 +3,11 @@ package org.bubblecloud.vr4java.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.bubblecloud.ilves.model.Company;
 import org.bubblecloud.vecmath.Quaternion;
 import org.bubblecloud.vecmath.Vector3f;
 import org.bubblecloud.vr4java.util.BytesUtil;
 import org.bubblecloud.vr4java.util.VrConstants;
-import org.vaadin.addons.sitekit.model.Company;
 
 import javax.persistence.*;
 import java.util.Date;

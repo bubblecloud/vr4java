@@ -2,6 +2,12 @@ package org.bubblecloud.vr4java.server;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.bubblecloud.ilves.Ilves;
+import org.bubblecloud.ilves.module.audit.AuditModule;
+import org.bubblecloud.ilves.module.content.ContentModule;
+import org.bubblecloud.ilves.module.customer.CustomerModule;
+import org.bubblecloud.ilves.server.jetty.DefaultJettyConfiguration;
+import org.bubblecloud.ilves.util.PropertiesUtil;
 import org.bubblecloud.vr4java.api.SceneService;
 import org.bubblecloud.vr4java.model.Scene;
 import org.bubblecloud.vr4java.model.SceneNode;
@@ -13,8 +19,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
-import org.vaadin.addons.sitekit.jetty.DefaultJettyConfiguration;
-import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import javax.websocket.server.ServerContainer;
 import java.net.URI;
@@ -41,7 +45,7 @@ public class ServerMain {
 
     private String serverIdentity;
     private RpcSealer sealer;
-    private ServerContext serverContext;
+    private ServerContext systemContext;
     private SceneRepository sceneRepository;
     private Server server;
     private ServerContainer container;
@@ -74,8 +78,8 @@ public class ServerMain {
 
         serverIdentity = PropertiesUtil.getProperty(PROPERTIES_CATEGORY, "server-certificate-self-sign-host-name");
         sealer = new RpcSealerImpl(serverIdentity);
-        serverContext = ServerContext.buildLocalServerContext(serverIdentity);
-        sceneRepository = new SceneRepository(serverContext);
+        systemContext = ServerContext.buildLocalServerContext(PropertiesUtil.getProperty(PROPERTIES_CATEGORY, "server-certificate-self-sign-host-name"));
+        sceneRepository = new SceneRepository(systemContext);
         sceneRepository.ensureSceneExists();
 
         final SceneService sceneService = ServerRpcService.getSceneService();
@@ -95,6 +99,10 @@ public class ServerMain {
 
         container = WebSocketServerContainerInitializer.configureContext(webSocketsContext);
         container.addEndpoint(ServerRpcService.class);
+
+        // Initialize modules
+        Ilves.initializeModule(AuditModule.class);
+        Ilves.initializeModule(ContentModule.class);
 
         server.start();
 

@@ -17,8 +17,7 @@ package org.bubblecloud.vr4java.security;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
-import org.vaadin.addons.sitekit.cache.InMemoryCache;
-import org.vaadin.addons.sitekit.model.User;
+import org.bubblecloud.ilves.cache.InMemoryCache;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

@@ -3,10 +3,10 @@ package org.bubblecloud.vr4java.ui;
 import com.jme3.scene.Spatial;
 import javazoom.jl.player.Player;
 import org.apache.commons.io.IOUtils;
+import org.bubblecloud.ilves.util.PropertiesUtil;
 import org.bubblecloud.vr4java.util.GoogleSpeechService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.addons.sitekit.util.PropertiesUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
